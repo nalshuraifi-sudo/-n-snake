@@ -97,14 +97,24 @@
             margin-top: 2px;
         }
 
-        #score { color: #22c55e; }
-        #high-score { color: #f97316; }
-        #level { color: #38bdf8; }
+        #score {
+            color: #22c55e;
+        }
+        #high-score {
+            color: #f97316;
+        }
+        #level {
+            color: #38bdf8;
+        }
 
         .rank-text {
             font-size: 0.78rem;
             color: #e5e7eb;
             margin-top: 4px;
+        }
+
+        select, button {
+            font-family: inherit;
         }
 
         #speed-select {
@@ -273,19 +283,6 @@
             100% { transform: scale(1); opacity: 1; }
         }
 
-        .combo-toast {
-            position: absolute;
-            top: 8px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(234, 88, 12, 0.96);
-            color: #111827;
-            border-radius: 999px;
-            padding: 4px 10px;
-            font-size: 0.75rem;
-            box-shadow: 0 0 14px rgba(234, 88, 12, 0.7);
-        }
-
         .controls {
             margin-top: 10px;
             display: flex;
@@ -325,32 +322,39 @@
             justify-content: center;
         }
 
+        /* === تصميم الأزرار الجديد (دائري + نيون) === */
         .dpad {
-            display: grid;
-            grid-template-columns: repeat(3, 50px);
-            grid-template-rows: repeat(3, 50px);
-            gap: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
         }
 
-        .dpad button {
-            border-radius: 14px;
-            border: 1px solid rgba(75, 85, 99, 0.9);
-            background: radial-gradient(circle at top, #0f172a, #020617);
-            color: #e5e7eb;
-            font-size: 1.1rem;
+        .dpad-middle-row {
+            display: flex;
+            gap: 16px;
+        }
+
+        .dpad-btn {
+            width: 64px;
+            height: 64px;
+            border-radius: 999px;
+            border: 2px solid #00ff9c;
+            background: radial-gradient(circle at 30% 20%, #00e5ff, #0066ff);
+            color: #f9fafb;
+            font-size: 1.4rem;
             cursor: pointer;
-            transition: transform 0.08s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 14px rgba(0, 255, 200, 0.45);
+            transition: transform 0.08s ease-out, box-shadow 0.08s ease-out, background 0.12s ease-out;
         }
 
-        .dpad button:active {
+        .dpad-btn:active {
             transform: scale(0.9);
-            background: #1d283a;
-        }
-
-        .dpad-empty {
-            pointer-events: none;
-            background: transparent !important;
-            border: none !important;
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.7);
+            background: radial-gradient(circle at 30% 20%, #22c55e, #16a34a);
         }
 
         footer {
@@ -414,6 +418,19 @@
             justify-content: center;
         }
 
+        .combo-toast {
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(234, 88, 12, 0.96);
+            color: #111827;
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            box-shadow: 0 0 14px rgba(234, 88, 12, 0.7);
+        }
+
         @media (max-width: 640px) {
             .top-row {
                 grid-template-columns: 1fr;
@@ -422,7 +439,6 @@
     </style>
 </head>
 <body>
-<!-- شاشة إدخال اسم اللاعب -->
 <div class="player-setup-overlay" id="player-setup">
     <div class="player-setup-card">
         <h2>مرحبًا بك في N-Snake</h2>
@@ -440,9 +456,7 @@
         <h1>لعبة الثعبان – N-Snake v3.3</h1>
         <div class="logo-n">N</div>
     </header>
-    <div class="subtitle">
-        إصدار مطوّر مع نظام لاعبين، لوحة متصدرين، سرعات بطيئة خاصة للمبتدئين، ودعم كامل للجوال.
-    </div>
+    <div class="subtitle">إصدار مطوّر مع نظام لاعبين، لوحة متصدرين، وواجهة محسّنة للجوال.</div>
 
     <div class="top-row">
         <div class="card">
@@ -464,10 +478,10 @@
             <div style="margin-top:6px;">
                 <span class="label" style="font-size:0.72rem;">السرعة</span>
                 <select id="speed-select">
-                    <option value="260" selected>بطيئة جدًا (مبتدئ)</option>
-                    <option value="210">بطيئة (مريحة)</option>
-                    <option value="160">متوسطة</option>
-                    <option value="120">سريعة</option>
+                    <option value="260">بطيئة جدًا (للمبتدئين)</option>
+                    <option value="210" selected>بطيئة (مريحة)</option>
+                    <option value="170">متوسطة</option>
+                    <option value="130">سريعة</option>
                 </select>
             </div>
         </div>
@@ -486,32 +500,21 @@
         <div class="game-area">
             <canvas id="game-canvas" width="400" height="400"></canvas>
 
-            <!-- شاشة انتهاء الجولة + خيار الاستمرار من آخر مستوى -->
             <div class="overlay" id="game-over-overlay">
                 <div class="overlay-card">
                     <h2>انتهت الجولة 💥</h2>
                     <p id="game-over-message"></p>
-                    <p>
-                        نتيجتك: <span id="final-score">0</span> –
-                        أعلى نتيجة لك: <span id="final-best-score">0</span>
-                    </p>
-                    <div style="margin-top:6px; display:flex; gap:6px; justify-content:center; flex-wrap:wrap;">
-                        <button class="btn" id="restart-from-start-btn">إعادة من البداية</button>
-                        <button class="btn secondary" id="restart-from-last-btn" style="display:none;">
-                            متابعة من المستوى الأخير
-                        </button>
-                    </div>
+                    <p>نتيجتك: <span id="final-score">0</span> – أعلى نتيجة لك: <span id="final-best-score">0</span></p>
+                    <button class="btn" id="restart-btn">لعبة جديدة</button>
                 </div>
             </div>
 
-            <!-- احتفال الفوز / كسر رقم -->
             <div class="celebration-overlay" id="celebration-overlay">
                 <div class="celebration-bubble" id="celebration-text">
                     🎉 مبروك! رقم قياسي جديد!
                 </div>
             </div>
 
-            <!-- رسالة كومبو -->
             <div id="combo-toast" class="combo-toast" style="display:none;">COMBO x2! 🔥</div>
         </div>
     </div>
@@ -524,18 +527,12 @@
         </div>
         <div class="dpad-wrapper">
             <div class="dpad">
-                <button class="dpad-empty"></button>
-                <button id="up-btn">↑</button>
-                <button class="dpad-empty"></button>
-
-                <!-- تصحيح الاتجاهات: كل زر يمشي في نفس اتجاه السهم -->
-                <button id="left-btn">←</button>
-                <button class="dpad-empty"></button>
-                <button id="right-btn">→</button>
-
-                <button class="dpad-empty"></button>
-                <button id="down-btn">↓</button>
-                <button class="dpad-empty"></button>
+                <button class="dpad-btn" id="up-btn">↑</button>
+                <div class="dpad-middle-row">
+                    <button class="dpad-btn" id="left-btn">←</button>
+                    <button class="dpad-btn" id="right-btn">→</button>
+                </div>
+                <button class="dpad-btn" id="down-btn">↓</button>
             </div>
         </div>
     </div>
@@ -545,13 +542,8 @@
     </footer>
 </div>
 
-<!-- صوت أكل الثعبان (Base64 مضمّن داخل الكود) -->
-<audio id="eat-sound" preload="auto"
-       src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=">
-</audio>
-
 <script>
-(function () {
+(function() {
     const canvas = document.getElementById('game-canvas');
     const ctx = canvas.getContext('2d');
 
@@ -564,8 +556,7 @@
     const gameOverMessageEl = document.getElementById('game-over-message');
     const finalScoreEl = document.getElementById('final-score');
     const finalBestScoreEl = document.getElementById('final-best-score');
-    const restartFromStartBtn = document.getElementById('restart-from-start-btn');
-    const restartFromLastBtn = document.getElementById('restart-from-last-btn');
+    const restartBtn = document.getElementById('restart-btn');
 
     const celebrationOverlay = document.getElementById('celebration-overlay');
     const celebrationTextEl = document.getElementById('celebration-text');
@@ -592,8 +583,6 @@
     const playerGamesLabel = document.getElementById('player-games-label');
     const leaderboardList = document.getElementById('leaderboard-list');
 
-    const eatSound = document.getElementById('eat-sound');
-
     const GRID_SIZE = 20;
     const COLS = canvas.width / GRID_SIZE;
     const ROWS = canvas.height / GRID_SIZE;
@@ -616,17 +605,8 @@
     let comboTimeoutId = null;
 
     let justAte = false;
-    let shieldActive = false; // محجوز لو حبيت تضيف درع لاحقاً
+    let shieldActive = false;
 
-    // لتأثير الانفجار
-    let lastCrashPos = null;
-
-    // نظام الاستمرار من آخر مستوى
-    let lastCheckpointScore = 0;
-    let lastCheckpointLevel = 1;
-    let canResumeFromCheckpoint = false;
-
-    // نظام اللاعبين
     let currentPlayerName = 'ضيف';
     let players = [];
     let currentPlayerRecord = null;
@@ -697,7 +677,7 @@
             const li = document.createElement('li');
             const leftSpan = document.createElement('span');
             const rightSpan = document.createElement('span');
-            leftSpan.innerHTML = '<span class="leaderboard-rank">#' + (idx + 1) + '</span>' + p.name;
+            leftSpan.innerHTML = '<span class="leaderboard-rank">#' + (idx+1) + '</span>' + p.name;
             rightSpan.className = 'leaderboard-score';
             rightSpan.textContent = p.highScore;
             li.appendChild(leftSpan);
@@ -706,34 +686,28 @@
         });
     }
 
-    // تهيئة اللعبة – تدعم البدء من نقطة معيّنة
-    function initGame(startScore = 0, startLevel = 1) {
+    function initGame() {
         snake = [
-            { x: 5, y: 10 },
-            { x: 4, y: 10 },
-            { x: 3, y: 10 }
+            {x: 5, y: 10},
+            {x: 4, y: 10},
+            {x: 3, y: 10}
         ];
         direction = 'right';
         nextDirection = 'right';
-
-        score = startScore;
-        level = startLevel;
+        score = 0;
+        level = 1;
         isPaused = false;
         isGameOver = false;
         lastEatTime = 0;
         comboCount = 0;
         justAte = false;
         shieldActive = false;
-        lastCrashPos = null;
-
-        scoreEl.textContent = score;
-        levelEl.textContent = level;
-        rankTextEl.textContent = 'اللقب: ' + rankForScore(score);
-
+        scoreEl.textContent = '0';
+        levelEl.textContent = '1';
+        rankTextEl.textContent = 'اللقب: ' + rankForScore(0);
         gameOverOverlay.classList.remove('visible');
         hideCelebration();
         hideComboToast();
-
         generateFood();
         updateSpeed();
         clearInterval(loopId);
@@ -741,11 +715,9 @@
         draw();
     }
 
-    // السرعة: أبطأ بكثيــر في البطيء + تسارع تدريجي خفيف
     function updateSpeed() {
         baseSpeed = parseInt(speedSelect.value, 10);
-        const reductionPerLevel = 6; // تقليل بسيط لكل مستوى
-        currentSpeed = Math.max(90, baseSpeed - (level - 1) * reductionPerLevel);
+        currentSpeed = Math.max(80, baseSpeed - (level - 1) * 12);
         if (!isGameOver && !isPaused) {
             clearInterval(loopId);
             loopId = setInterval(gameLoop, currentSpeed);
@@ -763,11 +735,10 @@
     }
 
     function flashLevelUp() {
-        const borderEl = canvas.parentElement;
-        const originalBorder = borderEl.style.borderColor || '#22c55e';
-        borderEl.style.borderColor = '#f97316';
+        const originalBorder = canvas.parentElement.style.borderColor;
+        canvas.parentElement.style.borderColor = '#f97316';
         setTimeout(() => {
-            borderEl.style.borderColor = originalBorder;
+            canvas.parentElement.style.borderColor = '#22c55e';
         }, 300);
         playBeep(660, 120);
     }
@@ -779,16 +750,15 @@
             const fy = Math.floor(Math.random() * ROWS);
             valid = !snake.some(seg => seg.x === fx && seg.y === fy);
             if (valid) {
-                food = { x: fx, y: fy };
+                food = {x: fx, y: fy};
             }
         }
     }
 
     function gameLoop() {
         if (isPaused || isGameOver) return;
-
         direction = nextDirection;
-        const head = { ...snake[0] };
+        const head = {...snake[0]};
         if (direction === 'up') head.y--;
         else if (direction === 'down') head.y++;
         else if (direction === 'left') head.x--;
@@ -848,18 +818,8 @@
         setLevelByScore();
         rankTextEl.textContent = 'اللقب: ' + rankForScore(score);
         generateFood();
+        playBeep(440, 80);
 
-        // صوت أكل مدمج
-        if (eatSound) {
-            try {
-                eatSound.currentTime = 0;
-                eatSound.play().catch(() => {});
-            } catch (e) {}
-        } else {
-            playBeep(440, 80);
-        }
-
-        // تحديث أعلى نتيجة
         if (currentPlayerRecord && score > currentPlayerRecord.highScore) {
             currentPlayerRecord.highScore = score;
             highScoreEl.textContent = score;
@@ -871,7 +831,6 @@
             }
         }
 
-        // احتفال عند 50 نقطة لأول مرة
         if (score >= 50 && score - gained < 50) {
             triggerCelebration('milestone');
         }
@@ -897,7 +856,6 @@
         }
     }
 
-    // أكل عبارة عن جبنة مثلثة مع نبض
     function drawFood() {
         if (!food) return;
         const cx = food.x * GRID_SIZE + GRID_SIZE / 2;
@@ -948,12 +906,11 @@
                 ctx.strokeStyle = '#0f172a';
                 ctx.lineWidth = 2;
                 ctx.beginPath();
-                ctx.roundRect(x + 2, y + 2, GRID_SIZE - 4, GRID_SIZE - 4, 6);
+                ctx.roundRect(x + 2, y + 2, GRID_SIZE - 4, GRID_SIZE - 4, 5);
                 ctx.fill();
                 ctx.stroke();
 
-                // العيون
-                const eyeRadius = 2.2;
+                const eyeRadius = 2;
                 ctx.fillStyle = '#0f172a';
                 if (direction === 'right') {
                     ctx.beginPath();
@@ -977,20 +934,18 @@
                     ctx.fill();
                 }
 
-                // فم واضح عند الأكل
                 if (justAte) {
                     ctx.fillStyle = '#0f172a';
                     ctx.beginPath();
                     if (direction === 'right') {
-                        ctx.roundRect(x + GRID_SIZE - 6, y + 8, 4, GRID_SIZE - 16, 2);
+                        ctx.fillRect(x + GRID_SIZE - 4, y + 8, 3, GRID_SIZE - 16);
                     } else if (direction === 'left') {
-                        ctx.roundRect(x + 2, y + 8, 4, GRID_SIZE - 16, 2);
+                        ctx.fillRect(x + 1, y + 8, 3, GRID_SIZE - 16);
                     } else if (direction === 'up') {
-                        ctx.roundRect(x + 8, y + 2, GRID_SIZE - 16, 4, 2);
+                        ctx.fillRect(x + 8, y + 1, GRID_SIZE - 16, 3);
                     } else if (direction === 'down') {
-                        ctx.roundRect(x + 8, y + GRID_SIZE - 6, GRID_SIZE - 16, 4, 2);
+                        ctx.fillRect(x + 8, y + GRID_SIZE - 4, GRID_SIZE - 16, 3);
                     }
-                    ctx.fill();
                 }
             } else {
                 const gradient = ctx.createLinearGradient(x, y, x + GRID_SIZE, y + GRID_SIZE);
@@ -1014,13 +969,13 @@
 
     function drawHintLine() {
         if (!snake.length || !food) return;
-        if (score > 80) return; // تلميح فقط للمبتدئين
-
         const head = snake[0];
         const hx = head.x * GRID_SIZE + GRID_SIZE / 2;
         const hy = head.y * GRID_SIZE + GRID_SIZE / 2;
         const fx = food.x * GRID_SIZE + GRID_SIZE / 2;
         const fy = food.y * GRID_SIZE + GRID_SIZE / 2;
+
+        if (score > 80) return;
 
         ctx.save();
         ctx.strokeStyle = 'rgba(59,130,246,0.4)';
@@ -1032,43 +987,17 @@
         ctx.restore();
     }
 
-    // انفجار بسيط عند مكان الاصطدام
-    function drawExplosion() {
-        if (!lastCrashPos) return;
-        const cx = lastCrashPos.x * GRID_SIZE + GRID_SIZE / 2;
-        const cy = lastCrashPos.y * GRID_SIZE + GRID_SIZE / 2;
-
-        const radius = GRID_SIZE * 1.6;
-        const grad = ctx.createRadialGradient(cx, cy, 2, cx, cy, radius);
-        grad.addColorStop(0, 'rgba(248,250,252,1)');
-        grad.addColorStop(0.4, 'rgba(248,113,113,0.9)');
-        grad.addColorStop(1, 'rgba(15,23,42,0)');
-
-        ctx.save();
-        ctx.fillStyle = grad;
-        ctx.beginPath();
-        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-    }
-
     function draw() {
         drawBackground();
         drawHintLine();
         drawFood();
         drawSnake();
-        if (isGameOver && lastCrashPos) {
-            drawExplosion();
-        }
     }
 
     function onGameOver(head) {
         isGameOver = true;
         clearInterval(loopId);
         playBeep(180, 220);
-
-        lastCrashPos = { x: head.x, y: head.y };
-        draw(); // رسم الإطار الأخير مع الانفجار
 
         const now = new Date().toISOString();
         if (currentPlayerRecord) {
@@ -1090,17 +1019,6 @@
         finalScoreEl.textContent = score;
         finalBestScoreEl.textContent = currentPlayerRecord ? currentPlayerRecord.highScore : score;
 
-        // إعداد نظام الاستمرار من المستوى الأخير (فوق 50 نقطة)
-        lastCheckpointScore = score;
-        lastCheckpointLevel = level;
-        canResumeFromCheckpoint = score >= 50;
-
-        if (canResumeFromCheckpoint) {
-            restartFromLastBtn.style.display = 'inline-block';
-        } else {
-            restartFromLastBtn.style.display = 'none';
-        }
-
         const template = lossMessagesTemplates[Math.floor(Math.random() * lossMessagesTemplates.length)];
         const msg = template.replace('[name]', currentPlayerName);
         gameOverMessageEl.textContent = msg;
@@ -1114,7 +1032,7 @@
         }
         celebrationTextEl.textContent = text;
         celebrationOverlay.classList.add('visible');
-        setTimeout(hideCelebration, 1000); // اختفاء تلقائي بعد ثانية
+        setTimeout(hideCelebration, 1000);
     }
 
     function hideCelebration() {
@@ -1161,8 +1079,7 @@
         } catch (e) {}
     }
 
-    // تحكم من لوحة المفاتيح
-    document.addEventListener('keydown', function (e) {
+    document.addEventListener('keydown', function(e) {
         if (playerSetup.style.display !== 'none') return;
 
         if (e.key === 'ArrowUp' && direction !== 'down') nextDirection = 'up';
@@ -1172,7 +1089,6 @@
         else if (e.key === ' ' || e.key === 'p' || e.key === 'P') togglePause();
     });
 
-    // أزرار الاتجاه على الجوال
     upBtn.addEventListener('click', () => { if (direction !== 'down') nextDirection = 'up'; });
     downBtn.addEventListener('click', () => { if (direction !== 'up') nextDirection = 'down'; });
     leftBtn.addEventListener('click', () => { if (direction !== 'right') nextDirection = 'left'; });
@@ -1186,27 +1102,16 @@
 
     pauseBtn.addEventListener('click', togglePause);
 
-    // إعادة من البداية – تعيد السرعة على أبطأ وضع تلقائيًا
-    restartFromStartBtn.addEventListener('click', function () {
+    restartBtn.addEventListener('click', function() {
         gameOverOverlay.classList.remove('visible');
-        lastCrashPos = null;
-        speedSelect.value = speedSelect.options[0].value; // بطيئة جدًا
-        initGame(0, 1);
+        initGame();
     });
 
-    // متابعة من المستوى الأخير
-    restartFromLastBtn.addEventListener('click', function () {
-        if (!canResumeFromCheckpoint) return;
-        gameOverOverlay.classList.remove('visible');
-        lastCrashPos = null;
-        initGame(lastCheckpointScore, lastCheckpointLevel);
-    });
-
-    speedSelect.addEventListener('change', function () {
+    speedSelect.addEventListener('change', function() {
         updateSpeed();
     });
 
-    shareBtn.addEventListener('click', function () {
+    shareBtn.addEventListener('click', function() {
         const text = 'حققت نتيجة ' + score + ' في لعبة N-Snake المطوّرة! جرّبها أنت أيضًا 🎮🐍';
         if (navigator.share) {
             navigator.share({
@@ -1222,11 +1127,11 @@
         }
     });
 
-    changePlayerBtn.addEventListener('click', function () {
+    changePlayerBtn.addEventListener('click', function() {
         playerSetup.style.display = 'flex';
     });
 
-    playerStartBtn.addEventListener('click', function () {
+    playerStartBtn.addEventListener('click', function() {
         const name = (playerNameInput.value || '').trim();
         if (!name) {
             alert('من فضلك أدخل اسمًا أولاً، أو اختر اللعب كضيف.');
@@ -1236,7 +1141,7 @@
         playerSetup.style.display = 'none';
     });
 
-    playerGuestBtn.addEventListener('click', function () {
+    playerGuestBtn.addEventListener('click', function() {
         startForPlayer('ضيف');
         playerSetup.style.display = 'none';
     });
@@ -1248,15 +1153,12 @@
         highScoreEl.textContent = currentPlayerRecord.highScore || 0;
         updatePlayerUI();
         updateLeaderboard();
-
-        // كل لاعب جديد يبدأ على أبطأ سرعة
-        speedSelect.value = speedSelect.options[0].value;
-        initGame(0, 1);
+        initGame();
     }
 
-    // تشغيل أولي
     loadPlayers();
     playerSetup.style.display = 'flex';
+
     draw();
 })();
 </script>
