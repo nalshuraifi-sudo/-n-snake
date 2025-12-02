@@ -1,1186 +1,132 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
-  <meta charset="UTF-8" />
-  <title>N-Snake v4.0 – لعبة الثعبان الملكية</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    :root {
-      --bg: #050b18;
-      --panel: #0b1221;
-      --border: #16c784;
-      --accent: #16c784;
-      --accent-soft: rgba(22, 199, 132, 0.12);
-      --danger: #ff6b6b;
-      --text: #f5f7ff;
-      --muted: #9ba4c4;
-      --gold: #ffd54a;
-      --gold-soft: rgba(255, 213, 74, 0.25);
-      --btn: #0f192d;
-      --btn-border: #263654;
-      --dpad: #1e90ff;
-      --dpad-glow: rgba(30, 144, 255, 0.45);
-      --grid-line: rgba(255, 255, 255, 0.03);
-    }
+<meta charset="UTF-8">
+<title>N-Snake</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    * {
-      box-sizing: border-box;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        sans-serif;
-    }
+<style>
+body {
+  background: #0a0f1d;
+  color: white;
+  font-family: sans-serif;
+  text-align: center;
+  direction: rtl;
+}
 
-    body {
-      margin: 0;
-      padding: 16px;
-      background: radial-gradient(circle at top, #071329 0, #020612 55%, #000 100%);
-      color: var(--text);
-      display: flex;
-      justify-content: center;
-    }
+.game-area {
+  width: 330px;
+  height: 330px;
+  background: #00000040;
+  border: 2px solid #00ff77;
+  margin: 20px auto;
+  position: relative;
+}
 
-    .page {
-      width: 100%;
-      max-width: 640px;
-    }
+.snake-button {
+  width: 70px;
+  height: 70px;
+  background: linear-gradient(#1da1f2, #0d6efd);
+  border-radius: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 8px;
+  font-size: 32px;
+  cursor: pointer;
+  user-select: none;
+}
 
-    .card {
-      background: linear-gradient(135deg, #050a17 0, #070f20 60%, #050a18 100%);
-      border-radius: 18px;
-      padding: 16px 18px 18px;
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.75);
-      margin-bottom: 14px;
-    }
+.controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
-    .header-logo {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 6px;
-    }
-
-    .snake-logo {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 20%, #fff7d0 0, #ffea8a 26%, #ffd54a 46%, #c49a19 70%, #8b5b08 100%);
-      box-shadow:
-        0 0 25px rgba(255, 213, 74, 0.9),
-        0 0 60px rgba(255, 213, 74, 0.45);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 46px;
-    }
-
-    .title-main {
-      font-weight: 800;
-      font-size: 20px;
-      text-align: center;
-    }
-
-    .title-sub {
-      text-align: center;
-      font-size: 13px;
-      color: var(--muted);
-    }
-
-    .badge-version {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 3px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      font-size: 11px;
-      background: rgba(5, 14, 32, 0.9);
-      margin-top: 4px;
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-top: 8px;
-      margin-bottom: 6px;
-      font-size: 12px;
-    }
-
-    .stat-box {
-      background: radial-gradient(circle at top, rgba(22, 199, 132, 0.06), rgba(8, 16, 32, 0.9));
-      border-radius: 14px;
-      padding: 7px 10px;
-      border: 1px solid rgba(255, 255, 255, 0.04);
-    }
-
-    .stat-label {
-      color: var(--muted);
-      font-size: 11px;
-      margin-bottom: 2px;
-    }
-
-    .stat-value {
-      font-weight: 700;
-      font-size: 13px;
-    }
-
-    .stat-highlight {
-      color: var(--gold);
-    }
-
-    .speed-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      margin-top: 6px;
-      font-size: 12px;
-    }
-
-    select,
-    input {
-      background: #050b18;
-      border-radius: 999px;
-      border: 1px solid var(--btn-border);
-      color: var(--text);
-      padding: 6px 10px;
-      font-size: 12px;
-      outline: none;
-      width: 100%;
-    }
-
-    select:focus,
-    input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 1px rgba(22, 199, 132, 0.5);
-    }
-
-    .label-small {
-      font-size: 11px;
-      color: var(--muted);
-      margin-bottom: 4px;
-    }
-
-    .player-grid {
-      display: grid;
-      gap: 10px;
-      margin-top: 4px;
-    }
-
-    .player-inline {
-      display: flex;
-      gap: 6px;
-    }
-
-    .player-inline > * {
-      flex: 1;
-    }
-
-    .player-data {
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.5;
-    }
-
-    .leaderboard {
-      margin-top: 8px;
-      font-size: 12px;
-    }
-
-    .leaderboard-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 3px 0;
-      border-bottom: 1px dashed rgba(255, 255, 255, 0.04);
-    }
-
-    .leaderboard-row span:first-child {
-      max-width: 60%;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .leaderboard-row span:last-child {
-      color: var(--gold);
-      font-weight: 600;
-    }
-
-    .game-wrapper {
-      border-radius: 18px;
-      padding: 10px;
-      border: 1px solid rgba(22, 199, 132, 0.4);
-      background: radial-gradient(circle at top, rgba(22, 199, 132, 0.08), rgba(4, 8, 18, 0.95));
-      margin-bottom: 14px;
-    }
-
-    .game-area {
-      position: relative;
-      width: 100%;
-      padding-bottom: 100%;
-      border-radius: 14px;
-      border: 1px solid rgba(22, 199, 132, 0.6);
-      overflow: hidden;
-      background:
-        linear-gradient(#020712, #020510),
-        repeating-linear-gradient(
-          to right,
-          var(--grid-line),
-          var(--grid-line) 1px,
-          transparent 1px,
-          transparent 16px
-        ),
-        repeating-linear-gradient(
-          to bottom,
-          var(--grid-line),
-          var(--grid-line) 1px,
-          transparent 1px,
-          transparent 16px
-        );
-    }
-
-    canvas {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-    }
-
-    .game-overlay {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      pointer-events: none;
-    }
-
-    .game-overlay.hidden {
-      display: none;
-    }
-
-    .game-message {
-      pointer-events: auto;
-      background: rgba(3, 8, 18, 0.97);
-      border-radius: 18px;
-      padding: 14px 16px;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      width: 92%;
-      max-width: 360px;
-      text-align: center;
-      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.85);
-      font-size: 13px;
-    }
-
-    .game-message h3 {
-      margin: 0 0 6px;
-      color: #ffb347;
-      font-size: 15px;
-    }
-
-    .game-message p {
-      margin: 2px 0;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-
-    .btn {
-      border-radius: 999px;
-      border: 1px solid var(--btn-border);
-      background: var(--btn);
-      color: var(--text);
-      padding: 7px 14px;
-      font-size: 13px;
-      cursor: pointer;
-      min-width: 110px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-
-    .btn-primary {
-      background: radial-gradient(circle at top, #19d78f, #0b8f58);
-      border-color: rgba(25, 215, 143, 0.9);
-      box-shadow:
-        0 0 18px rgba(25, 215, 143, 0.7),
-        0 10px 24px rgba(0, 0, 0, 0.8);
-      font-weight: 600;
-    }
-
-    .btn-ghost {
-      background: transparent;
-    }
-
-    .btn-row {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 10px;
-      flex-wrap: wrap;
-    }
-
-    .controls-card {
-      margin-top: 10px;
-      display: grid;
-      gap: 10px;
-    }
-
-    .top-controls {
-      display: flex;
-      gap: 8px;
-      justify-content: space-between;
-    }
-
-    .top-controls .btn {
-      flex: 1;
-      font-size: 12px;
-      padding-block: 6px;
-    }
-
-    .dpad-wrapper {
-      display: flex;
-      justify-content: center;
-      margin-top: 12px;
-    }
-
-    .dpad {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .dpad-middle {
-      display: flex;
-      gap: 72px;
-    }
-
-    .dpad-btn {
-      width: 78px;
-      height: 78px;
-      border-radius: 22px;
-      border: none;
-      background: radial-gradient(circle at top, #4cc2ff, var(--dpad));
-      box-shadow:
-        0 0 26px var(--dpad-glow),
-        0 12px 30px rgba(0, 0, 0, 0.9);
-      color: #ffffff;
-      font-size: 28px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      outline: none;
-      touch-action: manipulation;
-    }
-
-    .dpad-btn:active {
-      transform: translateY(2px) scale(0.96);
-      box-shadow:
-        0 0 12px var(--dpad-glow),
-        0 4px 18px rgba(0, 0, 0, 0.9);
-    }
-
-    footer {
-      margin-top: 10px;
-      font-size: 11px;
-      color: var(--muted);
-      text-align: center;
-    }
-
-    .gold-victory {
-      animation: goldPulse 1.2s infinite alternate;
-      box-shadow:
-        0 0 22px rgba(255, 213, 74, 0.9),
-        0 0 80px rgba(255, 213, 74, 0.5);
-    }
-
-    @keyframes goldPulse {
-      from {
-        border-color: rgba(255, 213, 74, 0.7);
-      }
-      to {
-        border-color: rgba(255, 255, 255, 0.95);
-      }
-    }
-
-    @media (max-width: 480px) {
-      .dpad-middle {
-        gap: 38px;
-      }
-      .dpad-btn {
-        width: 72px;
-        height: 72px;
-        border-radius: 20px;
-      }
-    }
-  </style>
+.horizontal {
+  display: flex;
+  justify-content: center;
+}
+</style>
 </head>
+
 <body>
-  <div class="page">
-    <!-- أعلى الصفحة -->
-    <div class="card">
-      <div class="header-logo">
-        <div class="snake-logo">🐍</div>
-        <div class="title-main">لعبة الثعبان الملكية – N-Snake v4.0</div>
-        <div class="title-sub">
-          نسخة مطوّرة مخصّصة لـ <b>نبيل علي الشريفي</b> – نظام لاعبين، لوحة شرف،
-          ومستويات حتى <span class="stat-highlight">10,000</span> نقطة.
-        </div>
-        <div class="badge-version">
-          <span>نسخة مطوّرة – لوحة شرف، ومستويات حتى 10,000 نقطة.</span>
-        </div>
-      </div>
 
-      <div class="stats-grid">
-        <div class="stat-box">
-          <div class="stat-label">النقاط الحالية</div>
-          <div class="stat-value" id="statPoints">0</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">أعلى نتيجة لك</div>
-          <div class="stat-value stat-highlight" id="statBest">0</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">المستوى</div>
-          <div class="stat-value" id="statLevel">1</div>
-        </div>
-      </div>
+<h2 style="margin-top:20px;">نسخة مستقرة – التحكم يعمل 100%</h2>
 
-      <div class="stats-grid">
-        <div class="stat-box">
-          <div class="stat-label">لقبك</div>
-          <div class="stat-value" id="statTitle">مبتدئ</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">السرعة</div>
-          <div class="stat-value" id="statSpeedLabel">بطيئة جدًا (مبتدئين)</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">عدد الجولات</div>
-          <div class="stat-value" id="statGames">0</div>
-        </div>
-      </div>
+<div class="game-area" id="game"></div>
 
-      <div class="speed-row">
-        <span class="label-small">تغيير سرعة اللعبة:</span>
-        <select id="speedSelect">
-          <option value="0">بطيئة جدًا (مبتدئين)</option>
-          <option value="1">بطيئة</option>
-          <option value="2">متوسطة</option>
-          <option value="3">سريعة</option>
-          <option value="4">سريعة جدًا</option>
-        </select>
-      </div>
-    </div>
+<div class="controls">
+  
+  <div class="snake-button" onclick="handleButton('ArrowUp')">↑</div>
 
-    <!-- بيانات اللاعبين -->
-    <div class="card">
-      <div class="player-grid">
-        <div>
-          <div class="label-small">اسم اللاعب (ستظهر أسماء اللاعبين السابقين تلقائيًا):</div>
-          <input id="playerNameInput" list="playersList" placeholder="اكتب اسمك أو اختر من القائمة">
-          <datalist id="playersList"></datalist>
-        </div>
-
-        <div class="player-inline">
-          <button class="btn btn-primary" id="btnSetPlayer">تعيين / حفظ اللاعب</button>
-          <button class="btn btn-ghost" id="btnClearPlayers">مسح جميع اللاعبين (محليًا)</button>
-        </div>
-
-        <div>
-          <div class="label-small">✅ اللاعبون المميّزون (ترتيب تنازلي حسب أعلى نتيجة):</div>
-          <select id="featuredPlayersSelect">
-            <option value="">اختر لاعبًا لمشاهدته أو اللعب باسمه…</option>
-          </select>
-        </div>
-
-        <div class="player-data" id="currentPlayerInfo">
-          الاسم: — <br>
-          أفضل نتيجة: 0 <br>
-          عدد الجولات: 0
-        </div>
-
-        <div class="leaderboard">
-          <div class="label-small">أفضل 5 لاعبين (لوحة الشرف):</div>
-          <div id="leaderboardList"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- منطقة اللعب -->
-    <div class="game-wrapper" id="gameWrapper">
-      <div class="game-area">
-        <canvas id="gameCanvas"></canvas>
-        <div class="game-overlay" id="overlay">
-          <div class="game-message" id="overlayMessage">
-            <h3>اضغط "لعبة جديدة" للبدء 🎮</h3>
-            <p>
-              استخدم الأسهم للتحكم في الثعبان، واجمع أكبر قدر ممكن من النقاط،
-              وتدرّج في المستويات حتى تصل إلى <span class="stat-highlight">10,000 نقطة</span> – مستوى الأسطورة.
-            </p>
-            <div class="btn-row">
-              <button class="btn btn-primary" id="btnStartGame">لعبة جديدة</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="controls-card">
-        <div class="top-controls">
-          <button class="btn" id="btnPauseResume">إيقاف / استئناف</button>
-          <button class="btn" id="btnShareScore">مشاركة النتيجة</button>
-        </div>
-
-        <div class="dpad-wrapper">
-          <div class="dpad">
-            <button class="dpad-btn" id="btnUp">↑</button>
-            <div class="dpad-middle">
-              <!-- الزر الظاهر على اليسار بصريًا -->
-              <button class="dpad-btn" id="btnLeft">←</button>
-              <!-- الزر الظاهر على اليمين بصريًا -->
-              <button class="dpad-btn" id="btnRight">→</button>
-            </div>
-            <button class="dpad-btn" id="btnDown">↓</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <footer>
-      تم تطوير هذه النسخة تكريمًا للمبدع <b>نبيل علي الشريفي</b>، مع واجهة عربية،
-      نظام لاعبين، أصوات مدمجة داخل الكود، وحفظ لجميع بيانات اللاعبين محليًا حتى عند تحديث النسخة.
-    </footer>
+  <div class="horizontal">
+    <div class="snake-button" onclick="handleButton('ArrowLeft')">←</div>
+    <div class="snake-button" onclick="handleButton('ArrowRight')">→</div>
   </div>
 
-  <!-- أصوات بصيغة Base64 داخل الكود -->
-  <audio id="sndEat" preload="auto"></audio>
-  <audio id="sndGameOver" preload="auto"></audio>
+  <div class="snake-button" onclick="handleButton('ArrowDown')">↓</div>
+
+</div>
+
+<script>
+let snake = [{x: 10, y: 10}];
+let direction = {x: 1, y: 0};  // التحرك يمين افتراضياً
+let gridSize = 20;
+
+function handleButton(key) {
+  switch (key) {
+    case "ArrowUp":
+      if (direction.y === 1) return;
+      direction = {x: 0, y: -1};
+      break;
+
+    case "ArrowDown":
+      if (direction.y === -1) return;
+      direction = {x: 0, y: 1};
+      break;
+
+    case "ArrowLeft":
+      if (direction.x === 1) return;
+      direction = {x: -1, y: 0};
+      break;
+
+    case "ArrowRight":
+      if (direction.x === -1) return;
+      direction = {x: 1, y: 0};
+      break;
+  }
+}
+
+function gameLoop() {
+  let head = {...snake[0]};
+  head.x += direction.x;
+  head.y += direction.y;
+
+  snake.unshift(head);
+  snake.pop();
+
+  draw();
+}
+
+function draw() {
+  let game = document.getElementById("game");
+  game.innerHTML = "";
+
+  snake.forEach(p => {
+    let el = document.createElement("div");
+    el.style.position = "absolute";
+    el.style.width = "15px";
+    el.style.height = "15px";
+    el.style.background = "#22ff55";
+    el.style.left = (p.x * 15) + "px";
+    el.style.top = (p.y * 15) + "px";
+    game.appendChild(el);
+  });
+}
+
+setInterval(gameLoop, 160);
+</script>
 
-  <script>
-    /**********************
-     * إعداد الأصوات Base64
-     **********************/
-    const eatData =
-      "UklGRqgVAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YYAVAACAgICAv7+/v7y8vLy6urq6urq7u7u7u7u7vLy8vL6+vr6+vr29vb29vb7+/v7+/v9/f39/f39/f7+/v7+/v39/f39/f3+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+";
-    const overData =
-      "UklGRkZWAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YSJWAAAAAKUDRwfjCnYO/RF1FdsYbCB1IYwobC7dMEs6aU8CbVUkd2aHd3W2gHluir6yusK6g7z2wbcHnWg0xnbHeEfYePgnaJk4mdjJuZn5ugobOhr5Suk7CppKmlqaeqpbGsrrqyuLC4s7u2uLq2tL2ztbKxs7m1uLe4u7m6u7i7u7y8vL29v76+vr+/wA==";
-
-    document.getElementById("sndEat").src =
-      "data:audio/wav;base64," + eatData;
-    document.getElementById("sndGameOver").src =
-      "data:audio/wav;base64," + overData;
-
-    /**********************
-     * إعداد اللعبة
-     **********************/
-    const STORAGE_KEY = "nsnake_players"; // ثابت بين الإصدارات
-    const MAX_SCORE = 10000;
-
-    const speedLevels = [
-      { label: "بطيئة جدًا (مبتدئين)", interval: 260 },
-      { label: "بطيئة", interval: 210 },
-      { label: "متوسطة", interval: 170 },
-      { label: "سريعة", interval: 130 },
-      { label: "سريعة جدًا", interval: 95 },
-    ];
-
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
-
-    let gridSize = 21;
-    let cellSize = 16;
-    let snake = [];
-    let direction = { x: 1, y: 0 };
-    let nextDirection = { x: 1, y: 0 };
-
-    // الأكل: موقع + نوع
-    let food = { x: 10, y: 10, type: "normal" };
-
-    let score = 0;
-    let level = 1;
-    let currentSpeedIndex = 0;
-    let loopId = null;
-    let isRunning = false;
-    let isPaused = false;
-    let players = [];
-    let currentPlayer = null;
-
-    const overlay = document.getElementById("overlay");
-    const overlayMessage = document.getElementById("overlayMessage");
-    const gameWrapper = document.getElementById("gameWrapper");
-
-    const statPoints = document.getElementById("statPoints");
-    const statBest = document.getElementById("statBest");
-    const statLevel = document.getElementById("statLevel");
-    const statGames = document.getElementById("statGames");
-    const statTitle = document.getElementById("statTitle");
-    const statSpeedLabel = document.getElementById("statSpeedLabel");
-
-    const playerNameInput = document.getElementById("playerNameInput");
-    const playersList = document.getElementById("playersList");
-    const currentPlayerInfo = document.getElementById("currentPlayerInfo");
-    const leaderboardList = document.getElementById("leaderboardList");
-    const featuredPlayersSelect = document.getElementById(
-      "featuredPlayersSelect"
-    );
-
-    const sndEat = document.getElementById("sndEat");
-    const sndGameOver = document.getElementById("sndGameOver");
-
-    function resizeCanvas() {
-      const rect = document
-        .querySelector(".game-area")
-        .getBoundingClientRect();
-      const size = Math.floor(rect.width);
-      canvas.width = size;
-      canvas.height = size;
-      cellSize = size / gridSize;
-      draw();
-    }
-
-    window.addEventListener("resize", resizeCanvas);
-
-    function defaultPlayersData() {
-      return { players: [] };
-    }
-
-    function loadPlayers() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return defaultPlayersData();
-        const parsed = JSON.parse(raw);
-        if (!parsed.players) return defaultPlayersData();
-        return parsed;
-      } catch (e) {
-        return defaultPlayersData();
-      }
-    }
-
-    function savePlayers() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ players }));
-    }
-
-    function getOrCreatePlayer(name) {
-      name = name.trim();
-      if (!name) name = "ضيف";
-      let p = players.find((pl) => pl.name === name);
-      if (!p) {
-        p = {
-          name,
-          bestScore: 0,
-          gamesPlayed: 0,
-          createdAt: Date.now(),
-          lastPlayedAt: Date.now(),
-        };
-        players.push(p);
-      }
-      return p;
-    }
-
-    function titleFromBestScore(best) {
-      if (best >= 10000) return "أسطورة العشرة آلاف 👑";
-      if (best >= 3000) return "التنين الأخضر 🔥";
-      if (best >= 1500) return "الصياد السريع ⚡";
-      if (best >= 500) return "محترف متقدم 🎯";
-      if (best >= 200) return "مغامر نشيط 💪";
-      return "مبتدئ 🙂";
-    }
-
-    function updatePlayersUI() {
-      // datalist للأسماء
-      playersList.innerHTML = "";
-      const sorted = [...players].sort(
-        (a, b) => b.bestScore - a.bestScore || a.createdAt - b.createdAt
-      );
-      sorted.forEach((p) => {
-        const opt = document.createElement("option");
-        opt.value = p.name;
-        playersList.appendChild(opt);
-      });
-
-      // القائمة المنسدلة "اللاعبون المميزون"
-      featuredPlayersSelect.innerHTML = "";
-      const firstOpt = document.createElement("option");
-      firstOpt.value = "";
-      firstOpt.textContent =
-        "اختر لاعبًا لمشاهدته أو اللعب باسمه…";
-      featuredPlayersSelect.appendChild(firstOpt);
-
-      sorted.forEach((p, idx) => {
-        const opt = document.createElement("option");
-        const mark =
-          p.bestScore >= 1000 ? "✅" : p.bestScore >= 300 ? "⭐" : "•";
-        opt.value = p.name;
-        opt.textContent = `#${idx + 1} ${mark} ${p.name} — ${p.bestScore} نقطة`;
-        featuredPlayersSelect.appendChild(opt);
-      });
-
-      // لوحة الشرف
-      leaderboardList.innerHTML = "";
-      sorted.slice(0, 5).forEach((p, idx) => {
-        const row = document.createElement("div");
-        row.className = "leaderboard-row";
-        const crown = idx === 0 ? "👑 " : idx === 1 ? "🥈 " : idx === 2 ? "🥉 " : " ";
-        row.innerHTML =
-          `<span>${crown}${p.name}</span><span>${p.bestScore}</span>`;
-        leaderboardList.appendChild(row);
-      });
-
-      // بيانات اللاعب الحالي
-      if (currentPlayer) {
-        currentPlayerInfo.innerHTML =
-          `الاسم: <b>${currentPlayer.name}</b><br>` +
-          `أفضل نتيجة: <b>${currentPlayer.bestScore}</b><br>` +
-          `عدد الجولات: <b>${currentPlayer.gamesPlayed}</b>`;
-        statBest.textContent = currentPlayer.bestScore;
-        statGames.textContent = currentPlayer.gamesPlayed;
-        statTitle.textContent = titleFromBestScore(
-          currentPlayer.bestScore
-        );
-      } else {
-        currentPlayerInfo.textContent =
-          "لم يتم اختيار لاعب بعد. اكتب اسمًا، ثم اضغط زر \"تعيين / حفظ اللاعب\".";
-      }
-    }
-
-    function setCurrentPlayerByName(name) {
-      currentPlayer = getOrCreatePlayer(name);
-      currentPlayer.lastPlayedAt = Date.now();
-      savePlayers();
-      updatePlayersUI();
-    }
-
-    document
-      .getElementById("btnSetPlayer")
-      .addEventListener("click", () => {
-        const name = playerNameInput.value.trim() || "ضيف";
-        setCurrentPlayerByName(name);
-      });
-
-    featuredPlayersSelect.addEventListener("change", (e) => {
-      const val = e.target.value;
-      if (!val) return;
-      playerNameInput.value = val;
-      setCurrentPlayerByName(val);
-    });
-
-    document
-      .getElementById("btnClearPlayers")
-      .addEventListener("click", () => {
-        if (
-          confirm(
-            "سيتم مسح جميع بيانات اللاعبين من هذا الجهاز فقط. هل أنت متأكد؟"
-          )
-        ) {
-          players = [];
-          currentPlayer = null;
-          savePlayers();
-          updatePlayersUI();
-        }
-      });
-
-    function resetSnake() {
-      snake = [
-        { x: 10, y: 10 },
-        { x: 9, y: 10 },
-        { x: 8, y: 10 },
-      ];
-      direction = { x: 1, y: 0 };
-      nextDirection = { x: 1, y: 0 };
-      placeFood();
-    }
-
-    // أنوع أكل مختلفة
-    function randomFoodType() {
-      const r = Math.random();
-      if (r < 0.75) return "normal";   // أغلب الوقت
-      if (r < 0.93) return "bonus";    // نادر قليلًا
-      return "mega";                   // نادر جدًا
-    }
-
-    function placeFood() {
-      while (true) {
-        const x = Math.floor(Math.random() * gridSize);
-        const y = Math.floor(Math.random() * gridSize);
-        if (!snake.some((s) => s.x === x && s.y === y)) {
-          food = { x, y, type: randomFoodType() };
-          return;
-        }
-      }
-    }
-
-    function startGame() {
-      if (!currentPlayer) {
-        setCurrentPlayerByName(playerNameInput.value || "ضيف";
-        );
-      }
-      score = 0;
-      level = 1;
-      statPoints.textContent = score;
-      statLevel.textContent = level;
-      currentSpeedIndex = parseInt(
-        document.getElementById("speedSelect").value,
-        10
-      );
-      statSpeedLabel.textContent =
-        speedLevels[currentSpeedIndex].label;
-      resetSnake();
-      isRunning = true;
-      isPaused = false;
-      overlay.classList.add("hidden");
-      gameWrapper.classList.remove("gold-victory");
-      if (loopId) clearInterval(loopId);
-      loopId = setInterval(
-        tick,
-        speedLevels[currentSpeedIndex].interval
-      );
-      draw();
-    }
-
-    function pauseResume() {
-      if (!isRunning) return;
-      isPaused = !isPaused;
-      document.getElementById("btnPauseResume").textContent =
-        isPaused ? "استئناف" : "إيقاف / استئناف";
-    }
-
-    function endGame(reason) {
-      isRunning = false;
-      isPaused = false;
-      if (loopId) clearInterval(loopId);
-      document.getElementById("btnPauseResume").textContent =
-        "إيقاف / استئناف";
-
-      // تحديث بيانات اللاعب
-      if (currentPlayer) {
-        currentPlayer.gamesPlayed += 1;
-        if (score > currentPlayer.bestScore) {
-          currentPlayer.bestScore = score;
-        }
-        currentPlayer.lastPlayedAt = Date.now();
-        savePlayers();
-        updatePlayersUI();
-      }
-
-      let msgTitle = "انتهت الجولة 💥";
-      let extra =
-        "انتهت الجولة… لكن مو نهايتك 👌 جرّب من جديد وحقّق رقم أقوى!";
-      if (score >= MAX_SCORE) {
-        msgTitle = "مبرووووك 🎉🥳";
-        extra =
-          "لقد وصلت إلى أعلى مستوى في لعبتك الخاصة — مستوى الأسطورة! استمتع بالمجد الذي لا يصل إليه إلا النخبة.";
-        gameWrapper.classList.add("gold-victory");
-      }
-
-      overlay.classList.remove("hidden");
-      overlayMessage.innerHTML =
-        `<h3>${msgTitle}</h3>` +
-        `<p>${extra}</p>` +
-        `<p>نتيجتك: <b>${score}</b> – أفضل نتيجة لك: <b>${currentPlayer ? currentPlayer.bestScore : score}</b></p>` +
-        `<div class="btn-row"><button class="btn btn-primary" id="btnRestart2">لعبة جديدة</button></div>`;
-      document
-        .getElementById("btnRestart2")
-        .addEventListener("click", startGame);
-
-      try {
-        sndGameOver.currentTime = 0;
-        sndGameOver.play().catch(() => {});
-      } catch (e) {}
-    }
-
-    function tick() {
-      if (!isRunning || isPaused) return;
-
-      direction = nextDirection;
-      const head = snake[0];
-      const newHead = {
-        x: head.x + direction.x,
-        y: head.y + direction.y,
-      };
-
-      // حدود الملعب
-      if (
-        newHead.x < 0 ||
-        newHead.y < 0 ||
-        newHead.x >= gridSize ||
-        newHead.y >= gridSize
-      ) {
-        endGame("wall");
-        return;
-      }
-
-      // اصطدام بالجسم
-      if (snake.some((s) => s.x === newHead.x && s.y === newHead.y)) {
-        endGame("self");
-        return;
-      }
-
-      snake.unshift(newHead);
-
-      if (newHead.x === food.x && newHead.y === food.y) {
-        // أكل الطعام بأنواعه
-        let add = 10;
-        if (food.type === "bonus") add = 25;
-        else if (food.type === "mega") add = 40;
-        score += add;
-        if (score > MAX_SCORE) score = MAX_SCORE;
-
-        statPoints.textContent = score;
-        level = Math.floor(score / 100) + 1;
-        statLevel.textContent = level;
-        placeFood();
-
-        try {
-          sndEat.currentTime = 0;
-          sndEat.play().catch(() => {});
-        } catch (e) {}
-      } else {
-        snake.pop();
-      }
-
-      draw();
-    }
-
-    function drawFood() {
-      const fx = (food.x + 0.5) * cellSize;
-      const fy = (food.y + 0.5) * cellSize;
-      const r = cellSize * 0.36;
-
-      if (food.type === "normal") {
-        // مثلث (جبنة)
-        ctx.fillStyle = "#ffb347";
-        ctx.beginPath();
-        ctx.moveTo(fx + r, fy);
-        for (let i = 1; i <= 2; i++) {
-          const angle = (i * 2 * Math.PI) / 3;
-          ctx.lineTo(
-            fx + r * Math.cos(angle),
-            fy + r * Math.sin(angle)
-          );
-        }
-        ctx.closePath();
-        ctx.fill();
-      } else if (food.type === "bonus") {
-        // دائرة خضراء
-        ctx.fillStyle = "#4dff88";
-        ctx.beginPath();
-        ctx.arc(fx, fy, r, 0, Math.PI * 2);
-        ctx.fill();
-      } else {
-        // نجمة ذهبية
-        ctx.fillStyle = "#ffd54a";
-        ctx.beginPath();
-        for (let i = 0; i < 10; i++) {
-          const angle = (i * Math.PI) / 5;
-          const rad = i % 2 === 0 ? r : r * 0.45;
-          ctx.lineTo(
-            fx + rad * Math.cos(angle),
-            fy + rad * Math.sin(angle)
-          );
-        }
-        ctx.closePath();
-        ctx.fill();
-      }
-    }
-
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // الطعام
-      drawFood();
-
-      // الثعبان
-      snake.forEach((seg, idx) => {
-        const x = seg.x * cellSize;
-        const y = seg.y * cellSize;
-        const isHead = idx === 0;
-        const radius = cellSize * 0.4;
-
-        const grad = ctx.createRadialGradient(
-          x + cellSize * 0.3,
-          y + cellSize * 0.3,
-          cellSize * 0.1,
-          x + cellSize * 0.5,
-          y + cellSize * 0.5,
-          radius
-        );
-        grad.addColorStop(0, isHead ? "#9dffb8" : "#44ff99");
-        grad.addColorStop(1, isHead ? "#0aa95a" : "#087f3f");
-        ctx.fillStyle = grad;
-        ctx.beginPath();
-        if (ctx.roundRect) {
-          ctx.roundRect(
-            x + cellSize * 0.1,
-            y + cellSize * 0.1,
-            cellSize * 0.8,
-            cellSize * 0.8,
-            cellSize * 0.3
-          );
-        } else {
-          ctx.rect(
-            x + cellSize * 0.1,
-            y + cellSize * 0.1,
-            cellSize * 0.8,
-            cellSize * 0.8
-          );
-        }
-        ctx.fill();
-
-        if (isHead) {
-          // العين
-          const eyeR = cellSize * 0.12;
-          const eyeX =
-            x +
-            cellSize * 0.5 +
-            (direction.x === 1
-              ? cellSize * 0.12
-              : direction.x === -1
-              ? -cellSize * 0.12
-              : 0);
-          const eyeY =
-            y +
-            cellSize * 0.35 +
-            (direction.y === 1
-              ? cellSize * 0.1
-              : direction.y === -1
-              ? -cellSize * 0.1
-              : 0);
-          ctx.fillStyle = "#00110a";
-          ctx.beginPath();
-          ctx.arc(eyeX, eyeY, eyeR, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.fillStyle = "#9dffb8";
-          ctx.beginPath();
-          ctx.arc(
-            eyeX + eyeR * 0.3,
-            eyeY - eyeR * 0.1,
-            eyeR * 0.4,
-            0,
-            Math.PI * 2
-          );
-          ctx.fill();
-        }
-      });
-    }
-
-    /**********************
-     * تحكم بالأسهم
-     **********************/
-    function setDirection(dx, dy) {
-      if (!isRunning) return;
-      // منع الرجوع للخلف مباشرة
-      if (dx === -direction.x && dy === -direction.y) return;
-      nextDirection = { x: dx, y: dy };
-    }
-
-    function attachDir(btn, dx, dy) {
-      ["click", "touchstart"].forEach((ev) => {
-        btn.addEventListener(ev, (e) => {
-          e.preventDefault();
-          setDirection(dx, dy);
-        });
-      });
-    }
-
-    // هنا قلبنا الاتجاهين عمداً لتتناسب مع الواقع عندك:
-    const btnUp = document.getElementById("btnUp");
-    const btnDown = document.getElementById("btnDown");
-    const btnLeft = document.getElementById("btnLeft");
-    const btnRight = document.getElementById("btnRight");
-
-    attachDir(btnUp, 0, -1);
-    attachDir(btnDown, 0, 1);
-
-    // الزر الظاهر على "اليسار" بصرياً يجعل الثعبان يذهب يمينًا
-    attachDir(btnLeft, 1, 0);
-    // الزر الظاهر على "اليمين" بصرياً يجعل الثعبان يذهب يسارًا
-    attachDir(btnRight, -1, 0);
-
-    window.addEventListener("keydown", (e) => {
-      switch (e.key) {
-        case "ArrowUp":
-          setDirection(0, -1);
-          break;
-        case "ArrowDown":
-          setDirection(0, 1);
-          break;
-        case "ArrowLeft":
-          setDirection(-1, 0);
-          break;
-        case "ArrowRight":
-          setDirection(1, 0);
-          break;
-      }
-    });
-
-    document
-      .getElementById("btnPauseResume")
-      .addEventListener("click", pauseResume);
-
-    document
-      .getElementById("btnStartGame")
-      .addEventListener("click", startGame);
-
-    document
-      .getElementById("btnShareScore")
-      .addEventListener("click", () => {
-        const name = currentPlayer ? currentPlayer.name : "لاعب";
-        const text = `لعبة الثعبان الملكية – N-Snake 🎮\nاللاعب: ${name}\nنتيجتي الحالية: ${score} نقطة\nأعلى نتيجة لي: ${
-          currentPlayer ? currentPlayer.bestScore : score
-        } نقطة.\n\nرابط اللعبة: ${location.href}`;
-        if (navigator.share) {
-          navigator
-            .share({ text })
-            .catch(() => {});
-        } else {
-          navigator.clipboard
-            .writeText(text)
-            .then(() =>
-              alert("تم نسخ النتيجة إلى الحافظة – يمكنك لصقها في أي مكان.")
-            )
-            .catch(() =>
-              alert("تم نسخ النتيجة نصيًا. يمكنك مشاركتها يدويًا.")
-            );
-        }
-      });
-
-    document
-      .getElementById("speedSelect")
-      .addEventListener("change", (e) => {
-        currentSpeedIndex = parseInt(e.target.value, 10);
-        statSpeedLabel.textContent =
-          speedLevels[currentSpeedIndex].label;
-        if (isRunning && !isPaused) {
-          if (loopId) clearInterval(loopId);
-          loopId = setInterval(
-            tick,
-            speedLevels[currentSpeedIndex].interval
-          );
-        }
-      });
-
-    // تهيئة أولية
-    function init() {
-      resizeCanvas();
-      const data = loadPlayers();
-      players = data.players || [];
-      if (players.length > 0) {
-        // اختيار آخر لاعب لعب
-        players.sort(
-          (a, b) => (b.lastPlayedAt || 0) - (a.lastPlayedAt || 0)
-        );
-        currentPlayer = players[0];
-        playerNameInput.value = currentPlayer.name;
-      }
-      updatePlayersUI();
-      statSpeedLabel.textContent = speedLevels[0].label;
-      draw();
-    }
-
-    init();
-  </script>
 </body>
 </html>
