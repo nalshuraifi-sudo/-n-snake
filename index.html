@@ -342,30 +342,30 @@
     .dpad-wrapper {
       display: flex;
       justify-content: center;
-      margin-top: 4px;
+      margin-top: 12px;
     }
 
     .dpad {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 6px;
+      gap: 14px;
     }
 
     .dpad-middle {
       display: flex;
-      gap: 40px;
+      gap: 72px;
     }
 
     .dpad-btn {
-      width: 74px;
-      height: 74px;
-      border-radius: 20px;
+      width: 78px;
+      height: 78px;
+      border-radius: 22px;
       border: none;
       background: radial-gradient(circle at top, #4cc2ff, var(--dpad));
       box-shadow:
-        0 0 24px var(--dpad-glow),
-        0 10px 28px rgba(0, 0, 0, 0.9);
+        0 0 26px var(--dpad-glow),
+        0 12px 30px rgba(0, 0, 0, 0.9);
       color: #ffffff;
       font-size: 28px;
       cursor: pointer;
@@ -408,12 +408,12 @@
 
     @media (max-width: 480px) {
       .dpad-middle {
-        gap: 26px;
+        gap: 38px;
       }
       .dpad-btn {
-        width: 68px;
-        height: 68px;
-        border-radius: 18px;
+        width: 72px;
+        height: 72px;
+        border-radius: 20px;
       }
     }
   </style>
@@ -538,9 +538,9 @@
           <div class="dpad">
             <button class="dpad-btn" id="btnUp">↑</button>
             <div class="dpad-middle">
-              <!-- لاحظ: هذا الزر فعليًا على اليسار -->
+              <!-- الزر الظاهر على اليسار بصريًا -->
               <button class="dpad-btn" id="btnLeft">←</button>
-              <!-- وهذا فعليًا على اليمين -->
+              <!-- الزر الظاهر على اليمين بصريًا -->
               <button class="dpad-btn" id="btnRight">→</button>
             </div>
             <button class="dpad-btn" id="btnDown">↓</button>
@@ -551,7 +551,7 @@
 
     <footer>
       تم تطوير هذه النسخة تكريمًا للمبدع <b>نبيل علي الشريفي</b>، مع واجهة عربية،
-      نظام لاعبين، وأصوات مدمجة داخل الكود، وحفظ لجميع بيانات اللاعبين محليًا حتى عند تحديث النسخة.
+      نظام لاعبين، أصوات مدمجة داخل الكود، وحفظ لجميع بيانات اللاعبين محليًا حتى عند تحديث النسخة.
     </footer>
   </div>
 
@@ -564,7 +564,7 @@
      * إعداد الأصوات Base64
      **********************/
     const eatData =
-      "UklGRqgVAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YYAVAACAgICAv7+/v7y8vLy6urq6urq7u7u7u7u7vLy8vL6+vr6+vr29vb29vb7+/v7+/v9/f39/f39/f7+/v7+/v39/f39/f3+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+";
+      "UklGRqgVAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YYAVAACAgICAv7+/v7y8vLy6urq6urq7u7u7u7u7vLy8vL6+vr6+vr29vb29vb7+/v7+/v9/f39/f39/f7+/v7+/v39/f39/f3+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+/v39/f39/f7+/v7+";
     const overData =
       "UklGRkZWAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YSJWAAAAAKUDRwfjCnYO/RF1FdsYbCB1IYwobC7dMEs6aU8CbVUkd2aHd3W2gHluir6yusK6g7z2wbcHnWg0xnbHeEfYePgnaJk4mdjJuZn5ugobOhr5Suk7CppKmlqaeqpbGsrrqyuLC4s7u2uLq2tL2ztbKxs7m1uLe4u7m6u7i7u7y8vL29v76+vr+/wA==";
 
@@ -595,7 +595,10 @@
     let snake = [];
     let direction = { x: 1, y: 0 };
     let nextDirection = { x: 1, y: 0 };
-    let food = { x: 10, y: 10 };
+
+    // الأكل: موقع + نوع
+    let food = { x: 10, y: 10, type: "normal" };
+
     let score = 0;
     let level = 1;
     let currentSpeedIndex = 0;
@@ -790,12 +793,20 @@
       placeFood();
     }
 
+    // أنوع أكل مختلفة
+    function randomFoodType() {
+      const r = Math.random();
+      if (r < 0.75) return "normal";   // أغلب الوقت
+      if (r < 0.93) return "bonus";    // نادر قليلًا
+      return "mega";                   // نادر جدًا
+    }
+
     function placeFood() {
       while (true) {
         const x = Math.floor(Math.random() * gridSize);
         const y = Math.floor(Math.random() * gridSize);
         if (!snake.some((s) => s.x === x && s.y === y)) {
-          food = { x, y };
+          food = { x, y, type: randomFoodType() };
           return;
         }
       }
@@ -803,7 +814,8 @@
 
     function startGame() {
       if (!currentPlayer) {
-        setCurrentPlayerByName(playerNameInput.value || "ضيف");
+        setCurrentPlayerByName(playerNameInput.value || "ضيف";
+        );
       }
       score = 0;
       level = 1;
@@ -909,13 +921,18 @@
       snake.unshift(newHead);
 
       if (newHead.x === food.x && newHead.y === food.y) {
-        // أكل الطعام
-        score += 10;
+        // أكل الطعام بأنواعه
+        let add = 10;
+        if (food.type === "bonus") add = 25;
+        else if (food.type === "mega") add = 40;
+        score += add;
         if (score > MAX_SCORE) score = MAX_SCORE;
+
         statPoints.textContent = score;
         level = Math.floor(score / 100) + 1;
         statLevel.textContent = level;
         placeFood();
+
         try {
           sndEat.currentTime = 0;
           sndEat.play().catch(() => {});
@@ -927,25 +944,53 @@
       draw();
     }
 
+    function drawFood() {
+      const fx = (food.x + 0.5) * cellSize;
+      const fy = (food.y + 0.5) * cellSize;
+      const r = cellSize * 0.36;
+
+      if (food.type === "normal") {
+        // مثلث (جبنة)
+        ctx.fillStyle = "#ffb347";
+        ctx.beginPath();
+        ctx.moveTo(fx + r, fy);
+        for (let i = 1; i <= 2; i++) {
+          const angle = (i * 2 * Math.PI) / 3;
+          ctx.lineTo(
+            fx + r * Math.cos(angle),
+            fy + r * Math.sin(angle)
+          );
+        }
+        ctx.closePath();
+        ctx.fill();
+      } else if (food.type === "bonus") {
+        // دائرة خضراء
+        ctx.fillStyle = "#4dff88";
+        ctx.beginPath();
+        ctx.arc(fx, fy, r, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        // نجمة ذهبية
+        ctx.fillStyle = "#ffd54a";
+        ctx.beginPath();
+        for (let i = 0; i < 10; i++) {
+          const angle = (i * Math.PI) / 5;
+          const rad = i % 2 === 0 ? r : r * 0.45;
+          ctx.lineTo(
+            fx + rad * Math.cos(angle),
+            fy + rad * Math.sin(angle)
+          );
+        }
+        ctx.closePath();
+        ctx.fill();
+      }
+    }
+
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // الطعام
-      ctx.fillStyle = "#ffb347";
-      ctx.beginPath();
-      const fx = (food.x + 0.5) * cellSize;
-      const fy = (food.y + 0.5) * cellSize;
-      const fr = cellSize * 0.35;
-      ctx.moveTo(fx + fr, fy);
-      for (let i = 1; i <= 3; i++) {
-        const angle = (i * 2 * Math.PI) / 3;
-        ctx.lineTo(
-          fx + fr * Math.cos(angle),
-          fy + fr * Math.sin(angle)
-        );
-      }
-      ctx.closePath();
-      ctx.fill();
+      drawFood();
 
       // الثعبان
       snake.forEach((seg, idx) => {
@@ -966,13 +1011,22 @@
         grad.addColorStop(1, isHead ? "#0aa95a" : "#087f3f");
         ctx.fillStyle = grad;
         ctx.beginPath();
-        ctx.roundRect(
-          x + cellSize * 0.1,
-          y + cellSize * 0.1,
-          cellSize * 0.8,
-          cellSize * 0.8,
-          cellSize * 0.3
-        );
+        if (ctx.roundRect) {
+          ctx.roundRect(
+            x + cellSize * 0.1,
+            y + cellSize * 0.1,
+            cellSize * 0.8,
+            cellSize * 0.8,
+            cellSize * 0.3
+          );
+        } else {
+          ctx.rect(
+            x + cellSize * 0.1,
+            y + cellSize * 0.1,
+            cellSize * 0.8,
+            cellSize * 0.8
+          );
+        }
         ctx.fill();
 
         if (isHead) {
@@ -1031,10 +1085,19 @@
       });
     }
 
-    attachDir(document.getElementById("btnUp"), 0, -1);
-    attachDir(document.getElementById("btnDown"), 0, 1);
-    attachDir(document.getElementById("btnLeft"), -1, 0); // 👈 يسار حقيقي
-    attachDir(document.getElementById("btnRight"), 1, 0); // 👉 يمين حقيقي
+    // هنا قلبنا الاتجاهين عمداً لتتناسب مع الواقع عندك:
+    const btnUp = document.getElementById("btnUp");
+    const btnDown = document.getElementById("btnDown");
+    const btnLeft = document.getElementById("btnLeft");
+    const btnRight = document.getElementById("btnRight");
+
+    attachDir(btnUp, 0, -1);
+    attachDir(btnDown, 0, 1);
+
+    // الزر الظاهر على "اليسار" بصرياً يجعل الثعبان يذهب يمينًا
+    attachDir(btnLeft, 1, 0);
+    // الزر الظاهر على "اليمين" بصرياً يجعل الثعبان يذهب يسارًا
+    attachDir(btnRight, -1, 0);
 
     window.addEventListener("keydown", (e) => {
       switch (e.key) {
