@@ -141,6 +141,7 @@
         .leaderboard-title {
             font-size: 0.8rem;
             color: #9ca3af;
+            margin-top: 6px;
             margin-bottom: 4px;
         }
 
@@ -311,16 +312,20 @@
         }
 
         .dpad-wrapper {
-            margin-top: 10px;
+            margin-top: 4px;
+            margin-bottom: 6px;
             display: flex;
             justify-content: center;
         }
 
+        /* حل جذر لمشكلة اليمين/اليسار */
         .dpad {
+            direction: ltr; /* المهم هنا حتى لا ينقلب الترتيب مع RTL */
             display: grid;
             grid-template-columns: repeat(3, 64px);
             grid-template-rows: repeat(3, 64px);
             gap: 10px;
+            justify-content: center;
         }
 
         .dpad button {
@@ -347,7 +352,7 @@
         }
 
         footer {
-            margin-top: 10px;
+            margin-top: 6px;
             text-align: center;
             font-size: 0.7rem;
             color: #9ca3af;
@@ -445,7 +450,9 @@
         <h1>لعبة الثعبان – N-Snake v3.3</h1>
         <div class="logo-n">N</div>
     </header>
-    <div class="subtitle">إصدار مطوّر مع نظام لاعبين، لوحة متصدرين، وواجهة محسّنة للجوال.</div>
+    <div class="subtitle">
+        إصدار مطوّر مع نظام لاعبين، لوحة متصدرين، وسرعات مريحة للمبتدئين مع تحكم محسّن للجوال.
+    </div>
 
     <div class="top-row">
         <div class="card">
@@ -468,10 +475,10 @@
                 <span class="label" style="font-size:0.72rem;">السرعة</span>
                 <select id="speed-select">
                     <option value="260" selected>بطيئة جدًا (مبتدئ)</option>
-                    <option value="220">بطيئة (مريحة)</option>
-                    <option value="190">متوسطة</option>
-                    <option value="160">سريعة معقولة</option>
-                    <option value="130">تحدّي</option>
+                    <option value="220">بطيئة</option>
+                    <option value="180">متوسطة</option>
+                    <option value="140">سريعة</option>
+                    <option value="115">سريعة +</option>
                 </select>
             </div>
         </div>
@@ -481,7 +488,7 @@
             <div class="player-line">الاسم: <span class="player-name" id="player-name-label">غير مذكور</span></div>
             <div class="player-line">أفضل نتيجة لك: <span id="player-best-label">0</span></div>
             <div class="player-line">عدد الجولات: <span id="player-games-label">0</span></div>
-            <div class="leaderboard-title" style="margin-top:6px;">أفضل 5 لاعبين (لوحة الشرف)</div>
+            <div class="leaderboard-title">أفضل 5 لاعبين (لوحة الشرف)</div>
             <ul class="leaderboard-list" id="leaderboard-list"></ul>
         </div>
     </div>
@@ -521,6 +528,7 @@
                 <button id="up-btn">↑</button>
                 <button class="dpad-empty"></button>
 
+                <!-- يسار حقيقي في اليسار، يمين حقيقي في اليمين -->
                 <button id="left-btn">←</button>
                 <button class="dpad-empty"></button>
                 <button id="right-btn">→</button>
@@ -672,7 +680,7 @@
             const li = document.createElement('li');
             const leftSpan = document.createElement('span');
             const rightSpan = document.createElement('span');
-            leftSpan.innerHTML = '<span class="leaderboard-rank">#' + (idx+1) + '</span>' + p.name;
+            leftSpan.innerHTML = '<span class="leaderboard-rank">#' + (idx + 1) + '</span>' + p.name;
             rightSpan.className = 'leaderboard-score';
             rightSpan.textContent = p.highScore;
             li.appendChild(leftSpan);
@@ -683,9 +691,9 @@
 
     function initGame() {
         snake = [
-            {x: 5, y: 10},
-            {x: 4, y: 10},
-            {x: 3, y: 10}
+            { x: 5, y: 10 },
+            { x: 4, y: 10 },
+            { x: 3, y: 10 }
         ];
         direction = 'right';
         nextDirection = 'right';
@@ -712,8 +720,7 @@
 
     function updateSpeed() {
         baseSpeed = parseInt(speedSelect.value, 10);
-        // سرعة منطقية للمبتدئين – لا نسمح أن تقل عن 120ms
-        currentSpeed = Math.max(120, baseSpeed - (level - 1) * 8);
+        currentSpeed = Math.max(90, baseSpeed - (level - 1) * 10);
         if (!isGameOver && !isPaused) {
             clearInterval(loopId);
             loopId = setInterval(gameLoop, currentSpeed);
@@ -731,10 +738,11 @@
     }
 
     function flashLevelUp() {
-        const originalBorder = canvas.parentElement.style.borderColor;
-        canvas.parentElement.style.borderColor = '#f97316';
+        const parent = canvas.parentElement;
+        const oldColor = parent.style.borderColor || '#22c55e';
+        parent.style.borderColor = '#f97316';
         setTimeout(() => {
-            canvas.parentElement.style.borderColor = '#22c55e';
+            parent.style.borderColor = oldColor;
         }, 300);
         playBeep(660, 120);
     }
@@ -746,7 +754,7 @@
             const fy = Math.floor(Math.random() * ROWS);
             valid = !snake.some(seg => seg.x === fx && seg.y === fy);
             if (valid) {
-                food = {x: fx, y: fy};
+                food = { x: fx, y: fy };
             }
         }
     }
@@ -754,7 +762,7 @@
     function gameLoop() {
         if (isPaused || isGameOver) return;
         direction = nextDirection;
-        const head = {...snake[0]};
+        const head = { ...snake[0] };
         if (direction === 'up') head.y--;
         else if (direction === 'down') head.y++;
         else if (direction === 'left') head.x--;
@@ -765,7 +773,7 @@
             if (shieldActive) {
                 shieldActive = false;
             } else {
-                onGameOver(head);
+                onGameOver();
                 return;
             }
         }
@@ -775,7 +783,7 @@
                 if (shieldActive) {
                     shieldActive = false;
                 } else {
-                    onGameOver(head);
+                    onGameOver();
                     return;
                 }
             }
@@ -965,13 +973,12 @@
 
     function drawHintLine() {
         if (!snake.length || !food) return;
+        if (score > 80) return;
         const head = snake[0];
         const hx = head.x * GRID_SIZE + GRID_SIZE / 2;
         const hy = head.y * GRID_SIZE + GRID_SIZE / 2;
         const fx = food.x * GRID_SIZE + GRID_SIZE / 2;
         const fy = food.y * GRID_SIZE + GRID_SIZE / 2;
-
-        if (score > 80) return;
 
         ctx.save();
         ctx.strokeStyle = 'rgba(59,130,246,0.4)';
@@ -990,7 +997,7 @@
         drawSnake();
     }
 
-    function onGameOver(head) {
+    function onGameOver() {
         isGameOver = true;
         clearInterval(loopId);
         playBeep(180, 220);
@@ -1075,6 +1082,7 @@
         } catch (e) {}
     }
 
+    // تحكم لوحة المفاتيح
     document.addEventListener('keydown', function(e) {
         if (playerSetup.style.display !== 'none') return;
 
@@ -1085,7 +1093,7 @@
         else if (e.key === ' ' || e.key === 'p' || e.key === 'P') togglePause();
     });
 
-    // أزرار الاتجاه للجوال
+    // أزرار الجوال
     upBtn.addEventListener('click', () => { if (direction !== 'down') nextDirection = 'up'; });
     downBtn.addEventListener('click', () => { if (direction !== 'up') nextDirection = 'down'; });
     leftBtn.addEventListener('click', () => { if (direction !== 'right') nextDirection = 'left'; });
