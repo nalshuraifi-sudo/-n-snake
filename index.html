@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8" />
-    <title>N-Snake v3.1 – لعبة الثعبان المطوّرة</title>
+    <title>N-Snake v3.2 – لعبة الثعبان المطوّرة</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
         * {
@@ -232,13 +232,21 @@
             color: #e5e7eb;
         }
 
+        .overlay-actions {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 6px;
+        }
+
         .btn {
             border: none;
             border-radius: 999px;
             padding: 6px 14px;
             font-size: 0.8rem;
             cursor: pointer;
-            margin-top: 6px;
+            margin-top: 2px;
             background: linear-gradient(135deg, #22c55e, #16a34a);
             color: #0f172a;
             font-weight: 600;
@@ -281,6 +289,22 @@
             0% { transform: scale(0.3); opacity: 0; }
             60% { transform: scale(1.05); opacity: 1; }
             100% { transform: scale(1); opacity: 1; }
+        }
+
+        .explosion-dot {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #f97316;
+            box-shadow: 0 0 10px rgba(248, 113, 113, 0.9);
+            pointer-events: none;
+            animation: explode 0.4s ease-out forwards;
+        }
+
+        @keyframes explode {
+            from { transform: translate(0,0) scale(0.7); opacity: 1; }
+            to { transform: translate(var(--dx), var(--dy)) scale(0.4); opacity: 0; }
         }
 
         .controls {
@@ -446,10 +470,10 @@
 
 <div class="container">
     <header>
-        <h1>لعبة الثعبان – N-Snake v3.1</h1>
+        <h1>لعبة الثعبان – N-Snake v3.2</h1>
         <div class="logo-n">N</div>
     </header>
-    <div class="subtitle">إصدار مطوّر مع نظام لاعبين، لوحة متصدرين، وواجهة محسّنة للجوال.</div>
+    <div class="subtitle">إصدار مطوّر مع نظام لاعبين، لوحة متصدرين، وسرعات مريحة للمبتدئين.</div>
 
     <div class="top-row">
         <div class="card">
@@ -469,11 +493,12 @@
             </div>
             <div class="rank-text" id="rank-text">اللقب: مبتدئ</div>
             <div style="margin-top:6px;">
-                <span class="label" style="font-size:0.72rem;">السرعة</span>
+                <span class="label" style="font-size:0.72rem;">السرعة المفضلة</span>
                 <select id="speed-select">
-                    <option value="170">بطيئة (مريحة)</option>
-                    <option value="130" selected>متوسطة</option>
-                    <option value="95">سريعة</option>
+                    <option value="260" selected>بطيئة جدًا (مبتدئ)</option>
+                    <option value="210">بطيئة</option>
+                    <option value="160">متوسطة</option>
+                    <option value="120">سريعة</option>
                 </select>
             </div>
         </div>
@@ -489,7 +514,7 @@
     </div>
 
     <div class="game-shell">
-        <div class="game-area">
+        <div class="game-area" id="game-area">
             <canvas id="game-canvas" width="400" height="400"></canvas>
 
             <div class="overlay" id="game-over-overlay">
@@ -497,7 +522,10 @@
                     <h2>انتهت الجولة 💥</h2>
                     <p id="game-over-message"></p>
                     <p>نتيجتك: <span id="final-score">0</span> – أعلى نتيجة لك: <span id="final-best-score">0</span></p>
-                    <button class="btn" id="restart-btn">لعبة جديدة</button>
+                    <div class="overlay-actions">
+                        <button class="btn" id="restart-from-start-btn">ابدأ من البداية</button>
+                        <button class="btn secondary" id="continue-btn">متابعة من المستوى الأخير</button>
+                    </div>
                 </div>
             </div>
 
@@ -523,10 +551,9 @@
                 <button id="up-btn">↑</button>
                 <button class="dpad-empty"></button>
 
-                <!-- عكس الأزرار كما طلبت: اليسار مكتوب عليه → ويمين ← لتكون مريحة -->
-                <button id="left-btn">→</button>
+                <button id="left-btn">←</button>
                 <button class="dpad-empty"></button>
-                <button id="right-btn">←</button>
+                <button id="right-btn">→</button>
 
                 <button class="dpad-empty"></button>
                 <button id="down-btn">↓</button>
@@ -544,6 +571,7 @@
 (function() {
     const canvas = document.getElementById('game-canvas');
     const ctx = canvas.getContext('2d');
+    const gameAreaEl = document.getElementById('game-area');
 
     const scoreEl = document.getElementById('score');
     const highScoreEl = document.getElementById('high-score');
@@ -554,7 +582,8 @@
     const gameOverMessageEl = document.getElementById('game-over-message');
     const finalScoreEl = document.getElementById('final-score');
     const finalBestScoreEl = document.getElementById('final-best-score');
-    const restartBtn = document.getElementById('restart-btn');
+    const restartFromStartBtn = document.getElementById('restart-from-start-btn');
+    const continueBtn = document.getElementById('continue-btn');
 
     const celebrationOverlay = document.getElementById('celebration-overlay');
     const celebrationTextEl = document.getElementById('celebration-text');
@@ -602,12 +631,14 @@
     let comboCount = 0;
     let comboTimeoutId = null;
 
-    let justAte = false;
-    let shieldActive = false; // محجوز مستقبلاً إذا أحببنا نضيفه
+    let eatEffectUntil = 0;
 
     let currentPlayerName = 'ضيف';
     let players = [];
     let currentPlayerRecord = null;
+
+    let canContinue = false;
+    let continueLevel = 1;
 
     const lossMessagesTemplates = [
         "محاولة ممتازة يا [name] 💪 اضغط إعادة وورّينا مستواك الحقيقي.",
@@ -684,7 +715,7 @@
         });
     }
 
-    function initGame() {
+    function initGame(startLevel = 1) {
         snake = [
             {x: 5, y: 10},
             {x: 4, y: 10},
@@ -693,15 +724,15 @@
         direction = 'right';
         nextDirection = 'right';
         score = 0;
-        level = 1;
+        level = startLevel;
         isPaused = false;
         isGameOver = false;
         lastEatTime = 0;
         comboCount = 0;
-        justAte = false;
-        shieldActive = false;
+        eatEffectUntil = 0;
+
         scoreEl.textContent = '0';
-        levelEl.textContent = '1';
+        levelEl.textContent = level;
         rankTextEl.textContent = 'اللقب: ' + rankForScore(0);
         gameOverOverlay.classList.remove('visible');
         hideCelebration();
@@ -715,7 +746,17 @@
 
     function updateSpeed() {
         baseSpeed = parseInt(speedSelect.value, 10);
-        currentSpeed = Math.max(70, baseSpeed - (level - 1) * 12);
+        let lv = level;
+        let speed;
+        // أول 3 مستويات أبطأ بشكل واضح
+        if (lv <= 1) speed = baseSpeed + 90;          // أبطأ شيء
+        else if (lv === 2) speed = baseSpeed + 60;
+        else if (lv === 3) speed = baseSpeed + 30;
+        else {
+            // من المستوى 4 يبدأ التسارع تدريجيًا
+            speed = baseSpeed - (lv - 4) * 10;
+        }
+        currentSpeed = Math.max(90, speed);
         if (!isGameOver && !isPaused) {
             clearInterval(loopId);
             loopId = setInterval(gameLoop, currentSpeed);
@@ -733,10 +774,10 @@
     }
 
     function flashLevelUp() {
-        const originalBorder = canvas.parentElement.style.borderColor;
-        canvas.parentElement.style.borderColor = '#f97316';
+        const originalBorder = gameAreaEl.style.borderColor;
+        gameAreaEl.style.borderColor = '#f97316';
         setTimeout(() => {
-            canvas.parentElement.style.borderColor = '#22c55e';
+            gameAreaEl.style.borderColor = '#22c55e';
         }, 300);
         playBeep(660, 120);
     }
@@ -764,33 +805,23 @@
 
         const hitWall = head.x < 0 || head.x >= COLS || head.y < 0 || head.y >= ROWS;
         if (hitWall) {
-            if (shieldActive) {
-                shieldActive = false;
-            } else {
-                onGameOver(head);
-                return;
-            }
+            onGameOver(head);
+            return;
         }
 
         for (let i = 0; i < snake.length; i++) {
             if (head.x === snake[i].x && head.y === snake[i].y) {
-                if (shieldActive) {
-                    shieldActive = false;
-                } else {
-                    onGameOver(head);
-                    return;
-                }
+                onGameOver(head);
+                return;
             }
         }
 
         snake.unshift(head);
 
         if (head.x === food.x && head.y === food.y) {
-            justAte = true;
             handleFoodEaten();
         } else {
             snake.pop();
-            justAte = false;
         }
 
         draw();
@@ -817,6 +848,9 @@
         rankTextEl.textContent = 'اللقب: ' + rankForScore(score);
         generateFood();
         playBeep(440, 80);
+
+        // تأثير المضغ لمدة قصيرة
+        eatEffectUntil = performance.now() + 400;
 
         if (currentPlayerRecord && score > currentPlayerRecord.highScore) {
             currentPlayerRecord.highScore = score;
@@ -867,6 +901,7 @@
         const pulse = 1 + 0.08 * Math.sin(t * 2 * Math.PI);
         ctx.scale(pulse, pulse);
 
+        // قطعة جبن مثلثة
         ctx.beginPath();
         ctx.moveTo(0, -h / 2);
         ctx.lineTo(-size / 2, h / 2);
@@ -889,6 +924,8 @@
     }
 
     function drawSnake() {
+        const chewing = performance.now() < eatEffectUntil;
+
         for (let i = snake.length - 1; i >= 0; i--) {
             const seg = snake[i];
             const x = seg.x * GRID_SIZE;
@@ -900,39 +937,45 @@
 
             if (isHead) {
                 const baseColor = score >= 50 ? '#eab308' : '#22c55e';
-                ctx.fillStyle = baseColor;
+                const headGradient = ctx.createLinearGradient(x, y, x + GRID_SIZE, y + GRID_SIZE);
+                headGradient.addColorStop(0, baseColor);
+                headGradient.addColorStop(1, '#16a34a');
+
+                ctx.fillStyle = headGradient;
                 ctx.strokeStyle = '#0f172a';
                 ctx.lineWidth = 2;
                 ctx.beginPath();
-                ctx.roundRect(x + 2, y + 2, GRID_SIZE - 4, GRID_SIZE - 4, 5);
+                ctx.roundRect(x + 1, y + 1, GRID_SIZE - 2, GRID_SIZE - 2, 7);
                 ctx.fill();
                 ctx.stroke();
 
-                const eyeRadius = 2;
+                // عيون
+                const eyeRadius = 2.4;
                 ctx.fillStyle = '#0f172a';
                 if (direction === 'right') {
                     ctx.beginPath();
-                    ctx.arc(x + GRID_SIZE - 7, y + 7, eyeRadius, 0, Math.PI * 2);
-                    ctx.arc(x + GRID_SIZE - 7, y + GRID_SIZE - 7, eyeRadius, 0, Math.PI * 2);
+                    ctx.arc(x + GRID_SIZE - 6, y + 8, eyeRadius, 0, Math.PI * 2);
+                    ctx.arc(x + GRID_SIZE - 6, y + GRID_SIZE - 8, eyeRadius, 0, Math.PI * 2);
                     ctx.fill();
                 } else if (direction === 'left') {
                     ctx.beginPath();
-                    ctx.arc(x + 7, y + 7, eyeRadius, 0, Math.PI * 2);
-                    ctx.arc(x + 7, y + GRID_SIZE - 7, eyeRadius, 0, Math.PI * 2);
+                    ctx.arc(x + 6, y + 8, eyeRadius, 0, Math.PI * 2);
+                    ctx.arc(x + 6, y + GRID_SIZE - 8, eyeRadius, 0, Math.PI * 2);
                     ctx.fill();
                 } else if (direction === 'up') {
                     ctx.beginPath();
-                    ctx.arc(x + 7, y + 7, eyeRadius, 0, Math.PI * 2);
-                    ctx.arc(x + GRID_SIZE - 7, y + 7, eyeRadius, 0, Math.PI * 2);
+                    ctx.arc(x + 8, y + 6, eyeRadius, 0, Math.PI * 2);
+                    ctx.arc(x + GRID_SIZE - 8, y + 6, eyeRadius, 0, Math.PI * 2);
                     ctx.fill();
                 } else {
                     ctx.beginPath();
-                    ctx.arc(x + 7, y + GRID_SIZE - 7, eyeRadius, 0, Math.PI * 2);
-                    ctx.arc(x + GRID_SIZE - 7, y + GRID_SIZE - 7, eyeRadius, 0, Math.PI * 2);
+                    ctx.arc(x + 8, y + GRID_SIZE - 6, eyeRadius, 0, Math.PI * 2);
+                    ctx.arc(x + GRID_SIZE - 8, y + GRID_SIZE - 6, eyeRadius, 0, Math.PI * 2);
                     ctx.fill();
                 }
 
-                if (justAte) {
+                // فم / مضغ
+                if (chewing) {
                     ctx.fillStyle = '#0f172a';
                     ctx.beginPath();
                     if (direction === 'right') {
@@ -992,10 +1035,34 @@
         drawSnake();
     }
 
+    function spawnExplosion(head) {
+        const rect = gameAreaEl.getBoundingClientRect();
+        const cx = head.x * GRID_SIZE + GRID_SIZE / 2;
+        const cy = head.y * GRID_SIZE + GRID_SIZE / 2;
+        const offsets = [
+            {dx: -20, dy: -10},
+            {dx: 18, dy: -8},
+            {dx: -15, dy: 14},
+            {dx: 16, dy: 16},
+            {dx: 0, dy: -22}
+        ];
+        offsets.forEach(o => {
+            const dot = document.createElement('div');
+            dot.className = 'explosion-dot';
+            dot.style.left = (cx + o.dx) + 'px';
+            dot.style.top = (cy + o.dy) + 'px';
+            dot.style.setProperty('--dx', o.dx + 'px');
+            dot.style.setProperty('--dy', o.dy + 'px');
+            gameAreaEl.appendChild(dot);
+            setTimeout(() => gameAreaEl.removeChild(dot), 400);
+        });
+    }
+
     function onGameOver(head) {
         isGameOver = true;
         clearInterval(loopId);
         playBeep(180, 220);
+        spawnExplosion(head);
 
         const now = new Date().toISOString();
         if (currentPlayerRecord) {
@@ -1020,6 +1087,17 @@
         const template = lossMessagesTemplates[Math.floor(Math.random() * lossMessagesTemplates.length)];
         const msg = template.replace('[name]', currentPlayerName);
         gameOverMessageEl.textContent = msg;
+
+        if (score >= 50) {
+            canContinue = true;
+            continueLevel = level;
+            continueBtn.style.display = 'inline-block';
+            continueBtn.textContent = 'متابعة من المستوى ' + level;
+        } else {
+            canContinue = false;
+            continueBtn.style.display = 'none';
+        }
+
         gameOverOverlay.classList.add('visible');
     }
 
@@ -1100,9 +1178,15 @@
 
     pauseBtn.addEventListener('click', togglePause);
 
-    restartBtn.addEventListener('click', function() {
+    restartFromStartBtn.addEventListener('click', function() {
         gameOverOverlay.classList.remove('visible');
-        initGame();
+        initGame(1);
+    });
+
+    continueBtn.addEventListener('click', function() {
+        if (!canContinue) return;
+        gameOverOverlay.classList.remove('visible');
+        initGame(continueLevel);
     });
 
     speedSelect.addEventListener('change', function() {
@@ -1151,12 +1235,11 @@
         highScoreEl.textContent = currentPlayerRecord.highScore || 0;
         updatePlayerUI();
         updateLeaderboard();
-        initGame();
+        initGame(1);
     }
 
     loadPlayers();
     playerSetup.style.display = 'flex';
-
     draw();
 })();
 </script>
