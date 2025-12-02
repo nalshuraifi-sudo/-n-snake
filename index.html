@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8" />
-    <title>N-Snake v3.3 – لعبة الثعبان المطوّرة</title>
+    <title>N-Snake v4.0 – النسخة الملكية</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
         * {
@@ -45,17 +45,20 @@
             color: #facc15;
         }
 
+        /* شعار الثعبان الذهبي */
         .logo-n {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            border: 2px solid #22c55e;
+            width: 46px;
+            height: 46px;
+            border-radius: 999px;
+            border: 2px solid #facc15;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 800;
-            color: #22c55e;
-            box-shadow: 0 0 12px rgba(34, 197, 94, 0.7);
+            font-size: 1.6rem;
+            color: #fef9c3;
+            box-shadow: 0 0 20px rgba(250, 204, 21, 0.85);
+            background: radial-gradient(circle at top, #facc15, #92400e);
         }
 
         .subtitle {
@@ -169,6 +172,30 @@
             margin-inline-start: 4px;
         }
 
+        .leaderboard-current {
+            background: rgba(34, 197, 94, 0.12);
+            border-radius: 6px;
+            padding-inline: 4px;
+        }
+
+        .player-select-label {
+            font-size: 0.75rem;
+            color: #9ca3af;
+            margin-top: 4px;
+            display: block;
+        }
+
+        #player-select {
+            width: 100%;
+            margin-top: 2px;
+            padding: 4px;
+            border-radius: 8px;
+            border: 1px solid #4b5563;
+            background: #020617;
+            color: #e5e7eb;
+            font-size: 0.78rem;
+        }
+
         .game-shell {
             margin-top: 10px;
             display: grid;
@@ -272,6 +299,12 @@
             animation: pop 0.7s ease-out;
         }
 
+        .maxscore-bubble {
+            background: radial-gradient(circle at top, #facc15, #92400e);
+            border-color: #fbbf24;
+            box-shadow: 0 0 26px rgba(250, 204, 21, 0.95);
+        }
+
         @keyframes pop {
             0% { transform: scale(0.3); opacity: 0; }
             60% { transform: scale(1.05); opacity: 1; }
@@ -318,30 +351,33 @@
             justify-content: center;
         }
 
-        /* حل جذر لمشكلة اليمين/اليسار */
+        /* تحسين التحكم – تكبير الأزرار، مسافات أوضح، مع الحفاظ على حل اليمين/اليسار */
         .dpad {
-            direction: ltr; /* المهم هنا حتى لا ينقلب الترتيب مع RTL */
+            direction: ltr; /* مهم حتى لا ينعكس الترتيب مع RTL */
             display: grid;
-            grid-template-columns: repeat(3, 64px);
-            grid-template-rows: repeat(3, 64px);
-            gap: 10px;
+            grid-template-columns: repeat(3, 78px);
+            grid-template-rows: repeat(3, 78px);
+            gap: 14px;
             justify-content: center;
+            align-items: center;
         }
 
         .dpad button {
-            border-radius: 999px;
+            border-radius: 22px;
             border: 1px solid rgba(75, 85, 99, 0.9);
-            background: radial-gradient(circle at top, #0ea5e9, #0284c7);
+            background: radial-gradient(circle at top, #0ea5e9, #0369a1);
             color: #e5e7eb;
-            font-size: 1.4rem;
+            font-size: 1.6rem;
             cursor: pointer;
-            box-shadow: 0 0 20px rgba(56, 189, 248, 0.6);
-            transition: transform 0.08s, box-shadow 0.08s;
+            box-shadow: 0 0 22px rgba(56, 189, 248, 0.7);
+            transition: transform 0.06s ease-out, box-shadow 0.06s ease-out, background 0.1s;
+            touch-action: manipulation; /* تحسين الاستجابة على الجوال */
         }
 
         .dpad button:active {
             transform: scale(0.9);
-            box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.35);
+            background: radial-gradient(circle at bottom, #0284c7, #0f172a);
         }
 
         .dpad-empty {
@@ -402,6 +438,18 @@
             background: #020617;
             color: #e5e7eb;
             font-size: 0.8rem;
+            margin-bottom: 6px;
+            text-align: center;
+        }
+
+        .player-setup-card select {
+            width: 100%;
+            padding: 6px 10px;
+            border-radius: 999px;
+            border: 1px solid #4b5563;
+            background: #020617;
+            color: #e5e7eb;
+            font-size: 0.8rem;
             margin-bottom: 8px;
             text-align: center;
         }
@@ -435,9 +483,12 @@
 <body>
 <div class="player-setup-overlay" id="player-setup">
     <div class="player-setup-card">
-        <h2>مرحبًا بك في N-Snake</h2>
-        <p>أدخل اسمك لبدء اللعب وحفظ أفضل نتائجك، أو العب كضيف.</p>
-        <input type="text" id="player-name-input" placeholder="اكتب اسمك هنا" maxlength="18" />
+        <h2>مرحبًا بك في N-Snake v4.0</h2>
+        <p>اختر اسمًا جديدًا أو اختر أحد اللاعبين السابقين من القائمة، وسيتم حفظ جميع نتائجك ومستوياتك تلقائيًا.</p>
+        <select id="existing-player-select">
+            <option value="">اختر لاعبًا سابقًا (اختياري)</option>
+        </select>
+        <input type="text" id="player-name-input" placeholder="أو اكتب اسم لاعب جديد هنا" maxlength="18" />
         <div class="player-setup-actions">
             <button class="btn" id="player-start-btn">ابدأ اللعب</button>
             <button class="btn secondary" id="player-guest-btn">العب كضيف</button>
@@ -447,11 +498,11 @@
 
 <div class="container">
     <header>
-        <h1>لعبة الثعبان – N-Snake v3.3</h1>
-        <div class="logo-n">N</div>
+        <h1>لعبة الثعبان الملكية – N-Snake v4.0</h1>
+        <div class="logo-n">🐍</div>
     </header>
     <div class="subtitle">
-        إصدار مطوّر مع نظام لاعبين، لوحة متصدرين، وسرعات مريحة للمبتدئين مع تحكم محسّن للجوال.
+        نسخة مطوّرة – لوحة شرف، ومستويات حتى 10,000 نقطة.
     </div>
 
     <div class="top-row">
@@ -488,6 +539,12 @@
             <div class="player-line">الاسم: <span class="player-name" id="player-name-label">غير مذكور</span></div>
             <div class="player-line">أفضل نتيجة لك: <span id="player-best-label">0</span></div>
             <div class="player-line">عدد الجولات: <span id="player-games-label">0</span></div>
+
+            <label class="player-select-label" for="player-select">اللاعبون المميزون (مرتّبون حسب أعلى نتيجة)</label>
+            <select id="player-select">
+                <option value="">اختر لاعبًا للاطلاع أو التبديل السريع</option>
+            </select>
+
             <div class="leaderboard-title">أفضل 5 لاعبين (لوحة الشرف)</div>
             <ul class="leaderboard-list" id="leaderboard-list"></ul>
         </div>
@@ -541,7 +598,7 @@
     </div>
 
     <footer>
-        تم تطوير هذه النسخة تكريمًا للمبدع <strong>نبيل علي الشريفي</strong>، مع واجهة عربية ودعم كامل للجوال.
+        تم تطوير هذه النسخة تكريمًا للمبدع <strong>نبيل علي الشريفي</strong>، مع واجهة عربية، ودعم كامل للجوال، وحفظ بيانات اللاعبين محليًا حتى عند تحديث النسخة.
     </footer>
 </div>
 
@@ -578,6 +635,7 @@
 
     const playerSetup = document.getElementById('player-setup');
     const playerNameInput = document.getElementById('player-name-input');
+    const existingPlayerSelect = document.getElementById('existing-player-select');
     const playerStartBtn = document.getElementById('player-start-btn');
     const playerGuestBtn = document.getElementById('player-guest-btn');
 
@@ -585,6 +643,7 @@
     const playerBestLabel = document.getElementById('player-best-label');
     const playerGamesLabel = document.getElementById('player-games-label');
     const leaderboardList = document.getElementById('leaderboard-list');
+    const playerSelect = document.getElementById('player-select');
 
     const GRID_SIZE = 20;
     const COLS = canvas.width / GRID_SIZE;
@@ -598,7 +657,7 @@
     let direction = 'right';
     let nextDirection = 'right';
 
-    let food = null;
+    let food = null; // سيصبح: {x, y, kind}
     let score = 0;
     let level = 1;
     let isPaused = false;
@@ -609,6 +668,9 @@
 
     let justAte = false;
     let shieldActive = false;
+
+    let maxScoreReached = false;
+    const MAX_SCORE = 10000;
 
     let currentPlayerName = 'ضيف';
     let players = [];
@@ -636,10 +698,15 @@
         return '#020617';
     }
 
+    /* ---------- نظام التخزين – الحفاظ على بيانات اللاعبين ---------- */
+
+    const STORAGE_KEY = 'nSnakePlayers'; // نفس المفتاح للحفاظ على التوافق
+
     function loadPlayers() {
         try {
-            const raw = localStorage.getItem('nSnakePlayers');
+            const raw = localStorage.getItem(STORAGE_KEY);
             players = raw ? JSON.parse(raw) : [];
+            if (!Array.isArray(players)) players = [];
         } catch (e) {
             players = [];
         }
@@ -647,7 +714,7 @@
 
     function savePlayers() {
         try {
-            localStorage.setItem('nSnakePlayers', JSON.stringify(players));
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(players));
         } catch (e) {}
     }
 
@@ -673,11 +740,40 @@
         playerGamesLabel.textContent = currentPlayerRecord.games;
     }
 
+    function updateSelectLists() {
+        // فرز اللاعبين حسب أعلى نتيجة
+        const sorted = [...players].sort((a, b) => b.highScore - a.highScore);
+
+        // قائمة شاشة البداية
+        existingPlayerSelect.innerHTML = '<option value="">اختر لاعبًا سابقًا (اختياري)</option>';
+        sorted.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.name;
+            opt.textContent = `${p.name} – ${p.highScore} نقطة`;
+            existingPlayerSelect.appendChild(opt);
+        });
+
+        // قائمة اللاعبين المميزين في الكارت الجانبي
+        playerSelect.innerHTML = '<option value="">اختر لاعبًا للاطلاع أو التبديل السريع</option>';
+        sorted.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.name;
+            opt.textContent = `${p.name} – ${p.highScore}`;
+            if (currentPlayerRecord && p.name === currentPlayerRecord.name) {
+                opt.selected = true;
+            }
+            playerSelect.appendChild(opt);
+        });
+    }
+
     function updateLeaderboard() {
         const sorted = [...players].sort((a, b) => b.highScore - a.highScore).slice(0, 5);
         leaderboardList.innerHTML = '';
         sorted.forEach((p, idx) => {
             const li = document.createElement('li');
+            if (currentPlayerRecord && p.name === currentPlayerRecord.name) {
+                li.classList.add('leaderboard-current');
+            }
             const leftSpan = document.createElement('span');
             const rightSpan = document.createElement('span');
             leftSpan.innerHTML = '<span class="leaderboard-rank">#' + (idx + 1) + '</span>' + p.name;
@@ -688,6 +784,10 @@
             leaderboardList.appendChild(li);
         });
     }
+
+    /* ---------- تهيئة اللعبة ---------- */
+
+    const GRID_SIZE_CONST = GRID_SIZE; // فقط للحفاظ على نفس الثابت داخليًا
 
     function initGame() {
         snake = [
@@ -705,6 +805,8 @@
         comboCount = 0;
         justAte = false;
         shieldActive = false;
+        maxScoreReached = false;
+
         scoreEl.textContent = '0';
         levelEl.textContent = '1';
         rankTextEl.textContent = 'اللقب: ' + rankForScore(0);
@@ -720,7 +822,8 @@
 
     function updateSpeed() {
         baseSpeed = parseInt(speedSelect.value, 10);
-        currentSpeed = Math.max(90, baseSpeed - (level - 1) * 10);
+        // سرعة منطقية ومريحة ومتدرجة
+        currentSpeed = Math.max(110, baseSpeed - (level - 1) * 10);
         if (!isGameOver && !isPaused) {
             clearInterval(loopId);
             loopId = setInterval(gameLoop, currentSpeed);
@@ -747,6 +850,9 @@
         playBeep(660, 120);
     }
 
+    /* ---------- الطعام المتنوع ---------- */
+
+    // kind: 0 عادي، 1 مميز، 2 نادر (الآن الاختلاف بصري فقط لتقليل تغييرات المنطق)
     function generateFood() {
         let valid = false;
         while (!valid) {
@@ -754,7 +860,8 @@
             const fy = Math.floor(Math.random() * ROWS);
             valid = !snake.some(seg => seg.x === fx && seg.y === fy);
             if (valid) {
-                food = { x: fx, y: fy };
+                const kind = Math.floor(Math.random() * 3); // 0..2
+                food = { x: fx, y: fy, kind };
             }
         }
     }
@@ -817,7 +924,16 @@
             showComboToast();
         }
 
-        score += gained;
+        // لا نتجاوز الحدّ الأقصى 10,000 نقطة
+        if (!maxScoreReached) {
+            score += gained;
+            if (score >= MAX_SCORE) {
+                score = MAX_SCORE;
+                maxScoreReached = true;
+                triggerMaxScoreCelebration();
+            }
+        }
+
         scoreEl.textContent = score;
         setLevelByScore();
         rankTextEl.textContent = 'اللقب: ' + rankForScore(score);
@@ -840,19 +956,21 @@
         }
     }
 
+    /* ---------- الرسم ---------- */
+
     function drawBackground() {
         ctx.fillStyle = bgColorForLevel(level);
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         ctx.strokeStyle = 'rgba(148,163,184,0.12)';
         ctx.lineWidth = 1;
-        for (let x = 0; x <= canvas.width; x += GRID_SIZE) {
+        for (let x = 0; x <= canvas.width; x += GRID_SIZE_CONST) {
             ctx.beginPath();
             ctx.moveTo(x, 0);
             ctx.lineTo(x, canvas.height);
             ctx.stroke();
         }
-        for (let y = 0; y <= canvas.height; y += GRID_SIZE) {
+        for (let y = 0; y <= canvas.height; y += GRID_SIZE_CONST) {
             ctx.beginPath();
             ctx.moveTo(0, y);
             ctx.lineTo(canvas.width, y);
@@ -862,34 +980,65 @@
 
     function drawFood() {
         if (!food) return;
-        const cx = food.x * GRID_SIZE + GRID_SIZE / 2;
-        const cy = food.y * GRID_SIZE + GRID_SIZE / 2;
-        const size = GRID_SIZE * 0.8;
+        const cx = food.x * GRID_SIZE_CONST + GRID_SIZE_CONST / 2;
+        const cy = food.y * GRID_SIZE_CONST + GRID_SIZE_CONST / 2;
+        const size = GRID_SIZE_CONST * 0.8;
         const h = size * 0.9;
 
         ctx.save();
         ctx.translate(cx, cy);
         const t = performance.now() / 400;
-        const pulse = 1 + 0.08 * Math.sin(t * 2 * Math.PI);
+        const pulse = 1 + 0.1 * Math.sin(t * 2 * Math.PI);
         ctx.scale(pulse, pulse);
 
-        ctx.beginPath();
-        ctx.moveTo(0, -h / 2);
-        ctx.lineTo(-size / 2, h / 2);
-        ctx.lineTo(size / 2, h / 2);
-        ctx.closePath();
-        ctx.fillStyle = '#facc15';
-        ctx.fill();
-        ctx.strokeStyle = '#f97316';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        ctx.fillStyle = '#7c2d12';
-        ctx.beginPath();
-        ctx.arc(-size * 0.15, 0, 2, 0, Math.PI * 2);
-        ctx.arc(0, h * 0.1, 2, 0, Math.PI * 2);
-        ctx.arc(size * 0.12, -h * 0.1, 2, 0, Math.PI * 2);
-        ctx.fill();
+        if (food.kind === 0) {
+            // مثلث جبن أصفر
+            ctx.beginPath();
+            ctx.moveTo(0, -h / 2);
+            ctx.lineTo(-size / 2, h / 2);
+            ctx.lineTo(size / 2, h / 2);
+            ctx.closePath();
+            ctx.fillStyle = '#facc15';
+            ctx.fill();
+            ctx.strokeStyle = '#f97316';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        } else if (food.kind === 1) {
+            // دائرة خضراء (تفاحة)
+            ctx.beginPath();
+            ctx.arc(0, 0, size * 0.4, 0, Math.PI * 2);
+            ctx.fillStyle = '#22c55e';
+            ctx.fill();
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#16a34a';
+            ctx.stroke();
+        } else {
+            // نجمة بنفسجية (طعام نادر)
+            const rOuter = size * 0.45;
+            const rInner = size * 0.2;
+            const spikes = 5;
+            let rot = Math.PI / 2 * 3;
+            let x = 0;
+            let y = 0;
+            ctx.beginPath();
+            ctx.moveTo(0, -rOuter);
+            for (let i = 0; i < spikes; i++) {
+                x = Math.cos(rot) * rOuter;
+                y = Math.sin(rot) * rOuter;
+                ctx.lineTo(x, y);
+                rot += Math.PI / spikes;
+                x = Math.cos(rot) * rInner;
+                y = Math.sin(rot) * rInner;
+                ctx.lineTo(x, y);
+                rot += Math.PI / spikes;
+            }
+            ctx.closePath();
+            ctx.fillStyle = '#a855f7';
+            ctx.fill();
+            ctx.strokeStyle = '#6d28d9';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
 
         ctx.restore();
     }
@@ -897,8 +1046,8 @@
     function drawSnake() {
         for (let i = snake.length - 1; i >= 0; i--) {
             const seg = snake[i];
-            const x = seg.x * GRID_SIZE;
-            const y = seg.y * GRID_SIZE;
+            const x = seg.x * GRID_SIZE_CONST;
+            const y = seg.y * GRID_SIZE_CONST;
             const isHead = (i === 0);
 
             let alpha = 0.9 - (i / (snake.length * 1.5));
@@ -910,7 +1059,7 @@
                 ctx.strokeStyle = '#0f172a';
                 ctx.lineWidth = 2;
                 ctx.beginPath();
-                ctx.roundRect(x + 2, y + 2, GRID_SIZE - 4, GRID_SIZE - 4, 5);
+                ctx.roundRect(x + 2, y + 2, GRID_SIZE_CONST - 4, GRID_SIZE_CONST - 4, 6);
                 ctx.fill();
                 ctx.stroke();
 
@@ -918,23 +1067,23 @@
                 ctx.fillStyle = '#0f172a';
                 if (direction === 'right') {
                     ctx.beginPath();
-                    ctx.arc(x + GRID_SIZE - 7, y + 7, eyeRadius, 0, Math.PI * 2);
-                    ctx.arc(x + GRID_SIZE - 7, y + GRID_SIZE - 7, eyeRadius, 0, Math.PI * 2);
+                    ctx.arc(x + GRID_SIZE_CONST - 7, y + 7, eyeRadius, 0, Math.PI * 2);
+                    ctx.arc(x + GRID_SIZE_CONST - 7, y + GRID_SIZE_CONST - 7, eyeRadius, 0, Math.PI * 2);
                     ctx.fill();
                 } else if (direction === 'left') {
                     ctx.beginPath();
                     ctx.arc(x + 7, y + 7, eyeRadius, 0, Math.PI * 2);
-                    ctx.arc(x + 7, y + GRID_SIZE - 7, eyeRadius, 0, Math.PI * 2);
+                    ctx.arc(x + 7, y + GRID_SIZE_CONST - 7, eyeRadius, 0, Math.PI * 2);
                     ctx.fill();
                 } else if (direction === 'up') {
                     ctx.beginPath();
                     ctx.arc(x + 7, y + 7, eyeRadius, 0, Math.PI * 2);
-                    ctx.arc(x + GRID_SIZE - 7, y + 7, eyeRadius, 0, Math.PI * 2);
+                    ctx.arc(x + GRID_SIZE_CONST - 7, y + 7, eyeRadius, 0, Math.PI * 2);
                     ctx.fill();
                 } else {
                     ctx.beginPath();
-                    ctx.arc(x + 7, y + GRID_SIZE - 7, eyeRadius, 0, Math.PI * 2);
-                    ctx.arc(x + GRID_SIZE - 7, y + GRID_SIZE - 7, eyeRadius, 0, Math.PI * 2);
+                    ctx.arc(x + 7, y + GRID_SIZE_CONST - 7, eyeRadius, 0, Math.PI * 2);
+                    ctx.arc(x + GRID_SIZE_CONST - 7, y + GRID_SIZE_CONST - 7, eyeRadius, 0, Math.PI * 2);
                     ctx.fill();
                 }
 
@@ -942,17 +1091,18 @@
                     ctx.fillStyle = '#0f172a';
                     ctx.beginPath();
                     if (direction === 'right') {
-                        ctx.fillRect(x + GRID_SIZE - 4, y + 8, 3, GRID_SIZE - 16);
+                        ctx.fillRect(x + GRID_SIZE_CONST - 4, y + 8, 3, GRID_SIZE_CONST - 16);
                     } else if (direction === 'left') {
-                        ctx.fillRect(x + 1, y + 8, 3, GRID_SIZE - 16);
+                        ctx.fillRect(x + 1, y + 8, 3, GRID_SIZE_CONST - 16);
                     } else if (direction === 'up') {
-                        ctx.fillRect(x + 8, y + 1, GRID_SIZE - 16, 3);
+                        ctx.fillRect(x + 8, y + 1, GRID_SIZE_CONST - 16, 3);
                     } else if (direction === 'down') {
-                        ctx.fillRect(x + 8, y + GRID_SIZE - 4, GRID_SIZE - 16, 3);
+                        ctx.fillRect(x + 8, y + GRID_SIZE_CONST - 4, GRID_SIZE_CONST - 16, 3);
                     }
                 }
             } else {
-                const gradient = ctx.createLinearGradient(x, y, x + GRID_SIZE, y + GRID_SIZE);
+                // جسم أكثر سلاسة ووضوحًا
+                const gradient = ctx.createLinearGradient(x, y, x + GRID_SIZE_CONST, y + GRID_SIZE_CONST);
                 if (score >= 50) {
                     gradient.addColorStop(0, 'rgba(147, 51, 234,' + alpha + ')');
                     gradient.addColorStop(1, 'rgba(236, 72, 153,' + alpha + ')');
@@ -964,7 +1114,7 @@
                 ctx.strokeStyle = 'rgba(15,23,42,0.9)';
                 ctx.lineWidth = 1.5;
                 ctx.beginPath();
-                ctx.roundRect(x + 3, y + 3, GRID_SIZE - 6, GRID_SIZE - 6, 4);
+                ctx.roundRect(x + 3, y + 3, GRID_SIZE_CONST - 6, GRID_SIZE_CONST - 6, 5);
                 ctx.fill();
                 ctx.stroke();
             }
@@ -975,10 +1125,10 @@
         if (!snake.length || !food) return;
         if (score > 80) return;
         const head = snake[0];
-        const hx = head.x * GRID_SIZE + GRID_SIZE / 2;
-        const hy = head.y * GRID_SIZE + GRID_SIZE / 2;
-        const fx = food.x * GRID_SIZE + GRID_SIZE / 2;
-        const fy = food.y * GRID_SIZE + GRID_SIZE / 2;
+        const hx = head.x * GRID_SIZE_CONST + GRID_SIZE_CONST / 2;
+        const hy = head.y * GRID_SIZE_CONST + GRID_SIZE_CONST / 2;
+        const fx = food.x * GRID_SIZE_CONST + GRID_SIZE_CONST / 2;
+        const fy = food.y * GRID_SIZE_CONST + GRID_SIZE_CONST / 2;
 
         ctx.save();
         ctx.strokeStyle = 'rgba(59,130,246,0.4)';
@@ -996,6 +1146,8 @@
         drawFood();
         drawSnake();
     }
+
+    /* ---------- إنهاء الجولة والاحتفالات ---------- */
 
     function onGameOver() {
         isGameOver = true;
@@ -1018,6 +1170,7 @@
         savePlayers();
         updatePlayerUI();
         updateLeaderboard();
+        updateSelectLists();
 
         finalScoreEl.textContent = score;
         finalBestScoreEl.textContent = currentPlayerRecord ? currentPlayerRecord.highScore : score;
@@ -1034,8 +1187,18 @@
             text = '🔥 وصلت لـ 50 نقطة يا ' + currentPlayerName + '! استمر!';
         }
         celebrationTextEl.textContent = text;
+        celebrationTextEl.classList.remove('maxscore-bubble');
         celebrationOverlay.classList.add('visible');
         setTimeout(hideCelebration, 1000);
+    }
+
+    function triggerMaxScoreCelebration() {
+        celebrationTextEl.textContent = '🎉🥳 مبروك! لقد وصلتَ إلى أعلى مستوى في لعبتك — مستوى الأسطورة!';
+        celebrationTextEl.classList.add('maxscore-bubble');
+        celebrationOverlay.classList.add('visible');
+        setTimeout(hideCelebration, 1800);
+        playBeep(880, 220);
+        playBeep(660, 220);
     }
 
     function hideCelebration() {
@@ -1051,6 +1214,8 @@
     function hideComboToast() {
         comboToast.style.display = 'none';
     }
+
+    /* ---------- المؤثرات الصوتية (كما في النسخ السابقة) ---------- */
 
     function playBeep(freq, duration) {
         try {
@@ -1082,7 +1247,8 @@
         } catch (e) {}
     }
 
-    // تحكم لوحة المفاتيح
+    /* ---------- التحكم بلوحة المفاتيح ---------- */
+
     document.addEventListener('keydown', function(e) {
         if (playerSetup.style.display !== 'none') return;
 
@@ -1093,11 +1259,27 @@
         else if (e.key === ' ' || e.key === 'p' || e.key === 'P') togglePause();
     });
 
-    // أزرار الجوال
-    upBtn.addEventListener('click', () => { if (direction !== 'down') nextDirection = 'up'; });
-    downBtn.addEventListener('click', () => { if (direction !== 'up') nextDirection = 'down'; });
-    leftBtn.addEventListener('click', () => { if (direction !== 'right') nextDirection = 'left'; });
-    rightBtn.addEventListener('click', () => { if (direction !== 'left') nextDirection = 'right'; });
+    /* ---------- أزرار الجوال – استجابة أعلى (click + touchstart) ---------- */
+
+    function bindDpadButton(btn, desiredDirection, oppositeDirection) {
+        function handler() {
+            if (direction !== oppositeDirection) {
+                nextDirection = desiredDirection;
+            }
+        }
+        btn.addEventListener('click', handler);
+        btn.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            handler();
+        }, { passive: false });
+    }
+
+    bindDpadButton(upBtn, 'up', 'down');
+    bindDpadButton(downBtn, 'down', 'up');
+    bindDpadButton(leftBtn, 'left', 'right');
+    bindDpadButton(rightBtn, 'right', 'left');
+
+    /* ---------- أزرار أخرى ---------- */
 
     function togglePause() {
         if (isGameOver) return;
@@ -1133,22 +1315,37 @@
     });
 
     changePlayerBtn.addEventListener('click', function() {
+        loadPlayers();
+        updateSelectLists();
         playerSetup.style.display = 'flex';
     });
 
     playerStartBtn.addEventListener('click', function() {
-        const name = (playerNameInput.value || '').trim();
+        let name = (playerNameInput.value || '').trim();
+        const existing = existingPlayerSelect.value;
+        if (!name && existing) {
+            name = existing;
+        }
         if (!name) {
-            alert('من فضلك أدخل اسمًا أولاً، أو اختر اللعب كضيف.');
+            alert('من فضلك أدخل اسمًا أو اختر لاعبًا من القائمة، أو اختر اللعب كضيف.');
             return;
         }
         startForPlayer(name);
         playerSetup.style.display = 'none';
+        playerNameInput.value = '';
     });
 
     playerGuestBtn.addEventListener('click', function() {
         startForPlayer('ضيف');
         playerSetup.style.display = 'none';
+        playerNameInput.value = '';
+    });
+
+    // اختيار لاعب مميز من الكارت الجانبي
+    playerSelect.addEventListener('change', function() {
+        const name = this.value;
+        if (!name) return;
+        startForPlayer(name);
     });
 
     function startForPlayer(name) {
@@ -1158,10 +1355,14 @@
         highScoreEl.textContent = currentPlayerRecord.highScore || 0;
         updatePlayerUI();
         updateLeaderboard();
+        updateSelectLists();
         initGame();
     }
 
+    /* ---------- بدء التشغيل ---------- */
+
     loadPlayers();
+    updateSelectLists();
     playerSetup.style.display = 'flex';
     draw();
 })();
