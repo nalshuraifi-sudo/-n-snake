@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8" />
-    <title>N-Snake v3.1 – لعبة الثعبان المطوّرة</title>
+    <title>N-Snake v3.2 – لعبة الثعبان المطوّرة</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
         * {
@@ -287,7 +287,7 @@
             margin-top: 10px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
         .buttons-row {
@@ -317,34 +317,33 @@
         }
 
         .dpad-wrapper {
-            margin-top: 12px;
-            margin-bottom: 4px;
+            margin-top: 16px; /* مسافة أكبر عن الأزرار العلوية */
             display: flex;
             justify-content: center;
         }
 
         .dpad {
             display: grid;
-            grid-template-columns: repeat(3, 68px);
-            grid-template-rows: repeat(3, 68px);
-            gap: 10px;
+            grid-template-columns: repeat(3, 64px);
+            grid-template-rows: repeat(3, 64px);
+            gap: 12px; /* توسيع المسافة بين الأزرار */
         }
 
         .dpad button {
             border-radius: 999px;
-            border: 1px solid rgba(56, 189, 248, 0.9);
+            border: 1px solid rgba(75, 85, 99, 0.9);
             background: radial-gradient(circle at top, #0ea5e9, #1d4ed8);
             color: #f9fafb;
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             cursor: pointer;
-            transition: transform 0.08s, box-shadow 0.08s, filter 0.08s;
-            box-shadow: 0 0 18px rgba(56, 189, 248, 0.6);
+            box-shadow: 0 0 18px rgba(56, 189, 248, 0.7);
+            transition: transform 0.08s, box-shadow 0.08s, filter 0.1s;
         }
 
         .dpad button:active {
             transform: scale(0.9);
-            filter: brightness(1.1);
             box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+            filter: brightness(0.95);
         }
 
         .dpad-empty {
@@ -434,8 +433,9 @@
             }
 
             .dpad {
-                grid-template-columns: repeat(3, 64px);
-                grid-template-rows: repeat(3, 64px);
+                grid-template-columns: repeat(3, 58px);
+                grid-template-rows: repeat(3, 58px);
+                gap: 10px;
             }
         }
     </style>
@@ -455,7 +455,7 @@
 
 <div class="container">
     <header>
-        <h1>لعبة الثعبان – N-Snake v3.1</h1>
+        <h1>لعبة الثعبان – N-Snake v3.2</h1>
         <div class="logo-n">N</div>
     </header>
     <div class="subtitle">إصدار مطوّر مع نظام لاعبين، لوحة متصدرين، وواجهة محسّنة للجوال.</div>
@@ -480,9 +480,10 @@
             <div style="margin-top:6px;">
                 <span class="label" style="font-size:0.72rem;">السرعة</span>
                 <select id="speed-select">
-                    <option value="190">بطيئة جدًا (مبتدئ)</option>
-                    <option value="150" selected>بطيئة (مريحة)</option>
-                    <option value="115">متوسطة</option>
+                    <option value="260">بطيئة جدًا (مبتدئ)</option>
+                    <option value="210" selected>بطيئة (مريحة)</option>
+                    <option value="160">متوسطة</option>
+                    <option value="120">سريعة</option>
                 </select>
             </div>
         </div>
@@ -532,6 +533,7 @@
                 <button id="up-btn">↑</button>
                 <button class="dpad-empty"></button>
 
+                <!-- الآن: اليسار على اليسار، واليمين على اليمين -->
                 <button id="left-btn">←</button>
                 <button class="dpad-empty"></button>
                 <button id="right-btn">→</button>
@@ -692,7 +694,7 @@
         });
     }
 
-    function initGame() {
+    function initGame(fromLevel = 1, fromScore = 0) {
         snake = [
             {x: 5, y: 10},
             {x: 4, y: 10},
@@ -700,17 +702,19 @@
         ];
         direction = 'right';
         nextDirection = 'right';
-        score = 0;
-        level = 1;
+        score = fromScore;
+        level = fromLevel;
         isPaused = false;
         isGameOver = false;
         lastEatTime = 0;
         comboCount = 0;
         justAte = false;
         shieldActive = false;
-        scoreEl.textContent = '0';
-        levelEl.textContent = '1';
-        rankTextEl.textContent = 'اللقب: ' + rankForScore(0);
+
+        scoreEl.textContent = score;
+        levelEl.textContent = level;
+        rankTextEl.textContent = 'اللقب: ' + rankForScore(score);
+
         gameOverOverlay.classList.remove('visible');
         hideCelebration();
         hideComboToast();
@@ -731,7 +735,11 @@
     }
 
     function setLevelByScore() {
-        const newLevel = Math.floor(score / 30) + 1;
+        const newLevel =
+            score < 50 ? 1 :
+            score < 100 ? 2 :
+            score < 150 ? 3 :
+            4;
         if (newLevel !== level) {
             level = newLevel;
             levelEl.textContent = level;
@@ -741,10 +749,11 @@
     }
 
     function flashLevelUp() {
-        const originalBorder = canvas.parentElement.style.borderColor;
-        canvas.parentElement.style.borderColor = '#f97316';
+        const parent = canvas.parentElement;
+        const originalBorder = parent.style.borderColor || '#22c55e';
+        parent.style.borderColor = '#f97316';
         setTimeout(() => {
-            canvas.parentElement.style.borderColor = '#22c55e';
+            parent.style.borderColor = '#22c55e';
         }, 300);
         playBeep(660, 120);
     }
@@ -775,7 +784,7 @@
             if (shieldActive) {
                 shieldActive = false;
             } else {
-                onGameOver();
+                onGameOver(head);
                 return;
             }
         }
@@ -785,7 +794,7 @@
                 if (shieldActive) {
                     shieldActive = false;
                 } else {
-                    onGameOver();
+                    onGameOver(head);
                     return;
                 }
             }
@@ -1000,7 +1009,7 @@
         drawSnake();
     }
 
-    function onGameOver() {
+    function onGameOver(head) {
         isGameOver = true;
         clearInterval(loopId);
         playBeep(180, 220);
@@ -1095,18 +1104,10 @@
         else if (e.key === ' ' || e.key === 'p' || e.key === 'P') togglePause();
     });
 
-    upBtn.addEventListener('click', () => {
-        if (direction !== 'down') nextDirection = 'up';
-    });
-    downBtn.addEventListener('click', () => {
-        if (direction !== 'up') nextDirection = 'down';
-    });
-    leftBtn.addEventListener('click', () => {
-        if (direction !== 'right') nextDirection = 'left';
-    });
-    rightBtn.addEventListener('click', () => {
-        if (direction !== 'left') nextDirection = 'right';
-    });
+    upBtn.addEventListener('click', () => { if (direction !== 'down') nextDirection = 'up'; });
+    downBtn.addEventListener('click', () => { if (direction !== 'up') nextDirection = 'down'; });
+    leftBtn.addEventListener('click', () => { if (direction !== 'right') nextDirection = 'left'; });
+    rightBtn.addEventListener('click', () => { if (direction !== 'left') nextDirection = 'right'; });
 
     function togglePause() {
         if (isGameOver) return;
@@ -1118,7 +1119,19 @@
 
     restartBtn.addEventListener('click', function() {
         gameOverOverlay.classList.remove('visible');
-        initGame();
+        // خيار: بداية من المستوى الأخير إذا كان >= 50
+        if (score >= 50) {
+            const continueFrom = confirm('هل تريد المتابعة من مستواك الأخير؟\n(نعم = متابعة، لا = بداية جديدة)');
+            if (continueFrom) {
+                const startLevel =
+                    score < 50 ? 1 :
+                    score < 100 ? 2 :
+                    score < 150 ? 3 : 4;
+                initGame(startLevel, score);
+                return;
+            }
+        }
+        initGame(1, 0);
     });
 
     speedSelect.addEventListener('change', function() {
@@ -1167,7 +1180,7 @@
         highScoreEl.textContent = currentPlayerRecord.highScore || 0;
         updatePlayerUI();
         updateLeaderboard();
-        initGame();
+        initGame(1, 0);
     }
 
     loadPlayers();
